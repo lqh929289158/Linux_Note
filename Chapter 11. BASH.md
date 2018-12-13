@@ -53,3 +53,7 @@ e.g. check whether `ls` is a built-in command.
 
 Use **\\** to escape!
 
+## 2. Shell Variable
+
+All uppercase characters.
+
