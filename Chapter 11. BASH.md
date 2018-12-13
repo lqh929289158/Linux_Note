@@ -57,3 +57,54 @@ Use **\\** to escape!
 
 All uppercase characters.
 
+### echo
+
+We use **echo** to get variable.
+
+```
+# echo $variable
+echo $PATH
+echo ${PATH}
+```
+
+### Rules of variable name.
+
+- **No SPACE**
+```
+myname = Ruloch #WRONG!
+myname = Ruloch L #WRONG!
+```
+
+- Letter beginning
+
+`2myname=Ruloch #WRONG!`
+
+- \" and \'
+```
+var="lang is $LANG"  # echo $var -> lang is en_US
+var='lang is $LANG'  # echo $var -> lang is $LANG
+```
+
+- Escape with \\ (turn $,\\, \[SPACE\], \' to normal character)
+- Use **\`_Command_\`** or **\$\(_Command_\)** to get result from a command
+```
+version=$(uname -r)
+# echo $version -> x.x.xx-xxx
+```
+
+- Extend variable with **\"\$_VAR_\"** or **\$\{_VAR_\}**
+```
+PATH="$PATH":/home/bin
+```
+
+- Use _export_ to turn varible as environment variable
+
+`export PATH`
+
+- Usually, uppercase for system default variable, lowercase for user variable.
+
+- Delete variable with _unset_
+```
+unset myname
+```
+
