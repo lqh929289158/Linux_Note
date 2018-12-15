@@ -108,3 +108,27 @@ PATH="$PATH":/home/bin
 unset myname
 ```
 
+### Functions of environment variable
+
+#### _env_
+
+Use `env` to list all environment variable.
+
+- HOME: home directory `~`
+- SHELL: which program is used by SHELL now? `/bin/bash`
+- HISTSIZE: how many entries of command will be recorded. Default: 1000.
+- MAIL: which mailbox is used now?
+- PATH: the paths that will be traversed when executing command. Sequence is IMPORTANT.
+- LANG: language system.
+- RANDOM: program that will be used to generate random number. 
+  - `/dev/random`.
+  - For BASH, random number is between 0~32767.
+  - To generate customized random number.
+  ```
+  declare -i number=$RANDOM*10/32768 ; echo $number
+  ```
+#### _set_
+
+Use `set` to list all variable(including environment variable and self-defined variable).
+
+
