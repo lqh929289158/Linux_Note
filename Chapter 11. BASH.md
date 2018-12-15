@@ -131,4 +131,27 @@ Use `env` to list all environment variable.
 
 Use `set` to list all variable(including environment variable and self-defined variable).
 
-
+- **PS1** (root@www ~)
+  - \\d : Date (e.g. Mon Feb 2)
+  - \\H : Host name (kkk.vbird.tsai)
+  - \\h : First segment of host name (kkk)
+  - \\t : 24-h time (HH:MM:SS)
+  - \\T : 12-h time (HH:MM:SS)
+  - \\A : 24-h time (HH:MM)
+  - \\@ : 12-h time (HH:MM:SS am/pm)
+  - \\u : Account name
+  - \\v : BASH version information
+  - \\w : Complete working directory.
+  - \\W : Only display last directory name
+  - \\# : Number of command.
+  - \\$ : root ~ #  other users ~ $
+- $ (Shell PID)
+```
+echo $$ # to get the PID of current shell
+```
+- ? (Return value of last command)
+  - Success : return 0
+  - Error : return error number
+- OSTYPE (Operating system type. e.g. linux-gnu)
+- HOSTTYPE (Installed software type. e.g. i686)
+- MACHTTYPE (Machine type. e.g. i686-redhat-linux-gnu)
