@@ -155,3 +155,125 @@ echo $$ # to get the PID of current shell
 - OSTYPE (Operating system type. e.g. linux-gnu)
 - HOSTTYPE (Installed software type. e.g. i686)
 - MACHTTYPE (Machine type. e.g. i686-redhat-linux-gnu)
+
+#### _export_
+
+Motivation: Make child-program to inherit custom-defined variables. (Child-program only inherit environment variables from father-program)
+
+```
+export variableName
+```
+
+If no variable name followed, `export` will list all environment variables.
+
+```
+export
+
+declare -x HISTSIZE="1000"
+declare -x HOME="/root"
+declare -x HOSTNAME="www.vbird.tsai"
+declare -x INPUTRC="/etc/inputrc"
+declare -x LANG="en_US"
+declare -x LOGNAME="root"
+...
+```
+
+### Language configuration _locale_
+
+List all supported languages.
+
+```
+locale -a
+
+zh_TW
+zh_TW.big5     
+zh_TW.euctw
+zh_TW.utf8
+zu_ZA
+zu_ZA.iso88591
+zu_ZA.utf8
+```
+
+List all variables you can configure.
+
+```
+locale
+
+LANG=en_US                   <==主语言的环境
+LC_CTYPE="en_US"             <==字符(文字)辨识的编码
+LC_NUMERIC="en_US"           <==数字系统的显示信息
+LC_TIME="en_US"              <==时间系统的显示数据
+LC_COLLATE="en_US"           <==字符串的比较与排序等
+LC_MONETARY="en_US"          <==币值格式的显示等
+LC_MESSAGES="en_US"          <==信息显示的内容，如菜单、错误信息等
+LC_ALL=                      <==整体语系的环境
+```
+
+If you configured `LANG` or `LC_ALL`, all other variables will be filled by this two.
+
+All language files are stored in `/usr/lib/locale/`.
+
+### Range of variable. 
+
+**Child program only inherits environment variables from father program**.
+
+- environment variable = global variable
+- custom-defined variabl = local variable
+
+### _read_, _array_, _declare_
+
+#### _read_  Reading variable from user-input.
+
+```
+read [-pt] variable
+```
+
+- \-p : Reminder string
+- \-t : Waiting time 
+
+#### _declare_ / _typeset_ Declaring variable's type
+
+```
+declare [-aixr] variable
+```
+
+- \-a : array-type
+- \-i : integer-type
+- \-x : to environment variable
+- \-r : read-only type, can't be changed or `unset`
+- \-p : list type of a variable
+> NOTE: Default type of variables is _string_.
+
+> NOTE: Computation in bash environment is limited in integer range.
+
+Turn `-` to `+` to cancel type.
+
+e.g. remove a variable from environment variable list.
+
+```
+declare +x variable
+```
+
+> NOTE: You can not cancel read-only type unless you re-login.
+
+#### _array_ 
+
+```
+var[index]=content
+```
+
+```
+var[1]="small min"
+var[2]="big min"
+var[3]="nice min"
+
+echo "${var[1]},${var[2]},${var[3]}"
+# small min, big min, nice min
+
+echo "${var}"
+# small min, big min, nice min
+```
+
+### _ulimit_ 
+
+### 
