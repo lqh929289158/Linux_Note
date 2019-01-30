@@ -385,3 +385,48 @@ ${variable//oldString/newString}
 | `var=${str:=expr}` | str=var=expr | str=var=expr | str=$str,var=$str |
 | `var=${str?expr}` | stderr<<expr | var= | var=$str |
 | `var=${str:?expr}` | stderr<<expr | stderr<<expr | var=$str |
+
+## 3. Alias and History
+
+### alias, unalias
+
+```
+alias newCommand='command'
+```
+e.g.
+```
+alias lm='ls -al | more
+alias rm='rm -i'
+```
+
+```
+unalias newCommand
+```
+e.g.
+```
+unalias lm
+```
+
+### history
+
+```
+history [n]
+history [-c]
+history [-raw] histfiles
+```
+
+- n: list last n lines of commands.
+- -c: clear all history commands of current shell.
+- -a: add new history command of current shell to `histfiles` or default `~/.bash_history`.
+- -r: read history commands from `histfiles` to current shell.
+- -w: write current history to `histfiles`
+
+```
+!number
+!command
+!!
+```
+
+- number: execute nth command.
+- command: execute the most recent command beginning with `command`
+- !: execute the last command.
