@@ -543,3 +543,114 @@ Activate configuration file immediately without logout.
 > NOTE: The return value of sub-expression will pass forward.`cmd1 && cmd2 || cmd3`
 
 
+## 6. Pipe
+
+Command1(stdout) | (stdin)Command2(stdout) | (stdin) Command3
+
+The latter command will take the stdout of the formmer as stdin. (**ONLY** standard output, not standard error)
+
+And the latter command **must** be the type of accepting stdin.
+
+### cut, grep
+
+- `cut`: Process information in the unit of **line**.
+  - -d: followed by _cutting character_. Combined with `-f`.
+  - -f: get the nth slice.
+  - -c: specify fixed interval.
+```
+范例一：将 PATH 变量取出，我要找出第五个路径。
+[root@www ~]# echo $PATH
+/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/X11R6/bin:/usr/games:
+# 1 |    2   |  3  |    4    |       5      |     6        |    7
+
+[root@www ~]# echo $PATH | cut -d ':' -f 5
+# 如同上面的数字显示，我们是以『 : 』作为分隔，因此会出现 /usr/local/bin 
+# 那么如果想要列出第 3 与第 5 呢？，就是这样：
+[root@www ~]# echo $PATH | cut -d ':' -f 3,5
+
+范例二：将 export 输出的信息，取得第 12 字符以后的所有字符串
+[root@www ~]# export
+declare -x HISTSIZE="1000"
+declare -x INPUTRC="/etc/inputrc"
+declare -x KDEDIR="/usr"
+declare -x LANG="zh_TW.big5"
+.....(其他省略).....
+# 注意看，每个数据都是排列整齐的输出！如果我们不想要『 declare -x 』时，
+# 就得这么做：
+
+[root@www ~]# export | cut -c 12-
+HISTSIZE="1000"
+INPUTRC="/etc/inputrc"
+KDEDIR="/usr"
+LANG="zh_TW.big5"
+.....(其他省略).....
+# 知道怎么回事了吧？用 -c 可以处理比较具有格式的输出数据！
+# 我们还可以指定某个范围的值，例如第 12-20 的字符，就是 cut -c 12-20 等等！
+
+范例三：用 last 将显示的登陆者的信息中，仅留下用户大名
+[root@www ~]# last
+root   pts/1    192.168.201.101  Sat Feb  7 12:35   still logged in
+root   pts/1    192.168.201.101  Fri Feb  6 12:13 - 18:46  (06:33)
+root   pts/1    192.168.201.254  Thu Feb  5 22:37 - 23:53  (01:16)
+# last 可以输出『账号/终端机/来源/日期时间』的数据，并且是排列整齐的
+
+[root@www ~]# last | cut -d ' ' -f 1
+# 由输出的结果我们可以发现第一个空白分隔的字段代表账号，所以使用如上命令：
+# 但是因为 root   pts/1 之间空格有好几个，并非仅有一个，所以，如果要找出 
+# pts/1 其实不能以 cut -d ' ' -f 1,2 喔！输出的结果会不是我们想要的。
+```
+
+- grep: search info line by line.
+  - -a: search binary file as text file.
+  - -c: count match.
+  - -i: igore lowercase or uppercase.
+  - -n: output line No.
+  - -v: output lines **NOT** containing match.
+  - --color=auto: display match with special color.
+  
+### sort, wc, uniq
+
+- sort
+  - -f: ignore case.
+  - -b: ignore leading spaces.
+  - -M: sort by Month Name sequence.
+  - -n: sort by number.
+  - -r: reverse sort
+  - -u: only one delegate for same lines.
+  - -t: _cutting characters_, default \[tab\].
+  - -k: sort by which field.
+- uniq: only display once for the repeated data.
+  - -i: ignore case.
+  - -c: count
+- wc: 
+  - -l: only list how many lines
+  - -w: only list how many letters
+  - -m: list how many characters
+
+### tee
+
+Save intermediate info to files and pass it to next pipe.
+
+- -a: appending mode.
+
+### tr, col, join, paste, expand
+
+- tr: delete or replace
+  - -d: delete the followed string from the info.
+  - -s: replace repeated character
+- col: usually used to convert \[tab\] to \[space\].
+  - -x: convert \[tab\] to \[space\]
+  - -b: Only keep character after '/'.
+- join: merge files
+  - -t: _cutting character_. default compare the first field.
+  - -i: ignore case.
+  - -1: the analyzed field of file1
+  - -2: the analyzed field of file2
+- paste: combine lines in two files with \[tab\]
+  - -d: _cutting character_
+- expand: convert \[tab\] to \[space\]
+  - -t: convert \[tab\] to #No. \[space\]
+
+### split
+
+### xargs
