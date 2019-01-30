@@ -430,3 +430,86 @@ history [-raw] histfiles
 - number: execute nth command.
 - command: execute the most recent command beginning with `command`
 - !: execute the last command.
+
+## 4. Bash shell Environment
+
+### Path and sequence of search
+
+Sequence of searching command
+
+1. Relative/Absolute path. e.g. `/bin/ls` or `./ls`
+2. alias
+3. bash builtin
+4. Search `$PATH` sequently.
+
+### Welcome info
+
+`/etc/issue`
+
+- \d: Local date.
+- \l: No. of terminal port
+- \m: Hardware level. (i386/i486....)
+- \n: Host's network name.
+- \o: Domain name.
+- \r: OS version (uname -r)
+- \t: Local time.
+- \s: Name of OS.
+- \v: Version of OS.
+
+`/etc/motd` (Info displayed after login)
+
+### Configuration file
+
+- **login shell**: Opened by inputting account and password.
+  - `/etc/profile`
+    - Contents:
+      - PATH: Decide whether `sbin` is included in `PATH` or not according to UID.
+      - MAIL: Configure mailbox to `/var/spool/mail` according to account.
+      - USER: Configure according to account.
+      - HOSTNAME: Configure according to hostname.
+      - HISTSIZE: Max history command number. Default 1000.
+    - Extending call:
+      - `/etc/inputrc`
+      - `/etc/profile.d/*.sh`: You can put configuration script here to implement alias, etc.
+      - `/etc/sysconfig/i18n`: called from `/etc/profile.d/lang.sh` to configure `$LANG`.
+    
+  - `~/.bash_profile`
+    - Only read one of three files `~/.bash_profile`,`~/.bash_login`,`~/.profile`.
+  - `~/.bashrc`: Read only when exist.
+- **non-login shell**: Opened by GUI or `bash`.
+  - `~/.bashrc`
+  
+#### source
+
+```
+source configuration_file
+```
+
+Activate configuration file immediately without logout.
+
+### Terminal configuration (stty, set)
+
+### Special Characters
+
+| Symbol | Meaning |
+| --- | --- |
+| # | Comment symbol in scripts |
+| \\ | Escape symbol |
+| \| | pipe |
+| ; | Multiple commands |
+| ~ | Home path |
+| $ | Load variable |
+| & | Job control |
+| ! | Logic NOT |
+| / | Path symbol |
+| >,>> | Data stream(output) replace,accumulation |
+| <,<< | Data stream(input) |
+| '' | Without variable-permutation |
+| "" | With variable-permutation |
+| \`\` | Command executed first |
+| $() | Command executed first |
+| () | Sub-shell |
+| {} | Command-block |
+  
+
+
