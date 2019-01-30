@@ -276,4 +276,112 @@ echo "${var}"
 
 ### _ulimit_ 
 
-### 
+Limit available resources for each users.
+
+```
+ulimit [-SHacdfltu] [quota]
+```
+
+- -H: hard limit
+- -S: soft limit (can over the limitation, but there will be warning)
+- -a: no arguments after, list all limitations.
+- -c: max volume for **core file**(the files that was created from crashed program)
+- -f: max file size that can be created.(KB)
+- -d: max segment in memory.
+- -l: available **lock** in memory.
+- -t: max CPU time that can be used. (s)
+- -u: max process number for a user.
+
+Simplest way to recover _ulimit_ is to relogin.
+
+> Warning: You can not increase file size when you have configured by `ulimit -f`
+
+
+### Delete, replacement, change of variables
+
+#### Delete
+
+```
+${variable#/*:}
+${variable##/*:}
+${variable%/*:}
+${variable%%/*:}
+```
+- `${...}` is necessary.
+- `variable` is the variable name
+- Direction
+  - `#` from left to right and only delete the shortest match.
+  - `##` from left to right and only delete the longest match.
+  - `%` from right to left and only delete the shortest match.
+  - `%%` from right to left and only delete the longest match.
+- Regular Expression.
+
+e.g.
+```
+
+范例一：先让小写的 path 自定义变量配置的与 PATH 内容相同
+[root@www ~]# path=${PATH}
+[root@www ~]# echo $path
+/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:
+/usr/sbin:/usr/bin:/root/bin  <==这两行其实是同一行啦！
+
+范例二：假设我不喜欢 kerberos，所以要将前两个目录删除掉，如何显示？
+[root@www ~]# echo ${path#/*kerberos/bin:}
+/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+
+
+${variable#/*kerberos/bin:}
+   上面的特殊字体部分是关键词！用在这种删除模式所必须存在的
+
+${variable#/*kerberos/bin:}
+   这就是原本的变量名称，以上面范例二来说，这里就填写 path 这个『变量名称』啦！
+
+${variable#/*kerberos/bin:}
+   这是重点！代表『从变量内容的最前面开始向右删除』，且仅删除最短的那个
+
+${variable#/*kerberos/bin:}
+   代表要被删除的部分，由于 # 代表由前面开始删除，所以这里便由开始的 / 写起。
+   需要注意的是，我们还可以透过通配符 * 来取代 0 到无穷多个任意字符
+
+   以上面范例二的结果来看， path 这个变量被删除的内容如下所示：
+/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:
+/usr/sbin:/usr/bin:/root/bin  <==这两行其实是同一行啦！
+
+
+范例三：我想要删除前面所有的目录，仅保留最后一个目录
+[root@www ~]# echo ${path#/*:}
+/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:
+/root/bin     <==这两行其实是同一行啦！
+# 由于一个 # 仅删除掉最短的那个，因此他删除的情况可以用底下的删除线来看：
+# /usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:
+# /usr/sbin:/usr/bin:/root/bin  <==这两行其实是同一行啦！
+
+[root@www ~]# echo ${path##/*:}
+/root/bin
+# 嘿！多加了一个 # 变成 ## 之后，他变成『删除掉最长的那个数据』！亦即是：
+# /usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:
+# /usr/sbin:/usr/bin:/root/bin  <==这两行其实是同一行啦！
+```
+
+#### Replacement
+
+```
+${variable/oldString/newString}
+${variable//oldString/newString}
+```
+
+- `/` Replace the first old string to new string.
+- `//` Replace all old strings to new string.
+
+#### Test and change
+
+| Configuration | str is NULL | str is empty string | str is non-empty string |
+| --- | --- | --- | --- |
+| `var=${str-expr}` | var=expr | var= | var=$str |
+| `var=${str:-expr}` | var=expr | var=expr | var=$str |
+| `var=${str+expr}` | var= | var=expr | var=expr |
+| `var=${str:+expr}` | var= | var= | var=expr |
+| `var=${str=expr}` | str=var=expr | str=$str,var= | str=$str,var=$str |
+| `var=${str:=expr}` | str=var=expr | str=var=expr | str=$str,var=$str |
+| `var=${str?expr}` | stderr<<expr | var= | var=$str |
+| `var=${str:?expr}` | stderr<<expr | stderr<<expr | var=$str |
