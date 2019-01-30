@@ -511,5 +511,35 @@ Activate configuration file immediately without logout.
 | () | Sub-shell |
 | {} | Command-block |
   
+## 5. Data Stream Redirection
+
+- Standard output & standard error output
+  - stdin: code 0, `<` or `<<`
+  - stdout: code 1, `>` or `>>`
+  - stderr: code 2, `2>` or `2>>`
+ 
+ e.g.
+ ```
+ find /home -name .bashrc > list_right 2> list_error
+ ```
+ 
+- `/dev/null` blackhole for unnecessary info.
+
+ e.g.
+ ```
+ find /home -name .bashrc 2> /dev/null
+ ```
+
+- `<` and `<<`
+  - `<` get input from file instead of keyboard. e.g.`cat > catfile < ~/.bashrc`
+  - `<<` define ending symbol. e.g. `cat > catfile <<"eof"`
+
+### ; && ||
+
+- `cmd;cmd`: execute commands sequently.
+- `cmd1 && cmd2`: cmd2 only executed when cmd1 return 0(success)
+- `cmd1 || cmd2`: cmd2 only executed when cmd1 return non-zero(fail)
+
+> NOTE: The return value of sub-expression will pass forward.`cmd1 && cmd2 || cmd3`
 
 
