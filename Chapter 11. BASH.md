@@ -489,6 +489,35 @@ Activate configuration file immediately without logout.
 
 ### Terminal configuration (stty, set)
 
+### General Matching Characters
+
+| Symbol | Meaning |
+| --- | --- |
+| * | zero or more repeat |
+| ? | one or more repeat |
+| \[\] | one of the characters in bracket |
+| \[-\] | one of the characters in a range(ASCii) |
+| \[^\] | reverse choosing in bracket |
+
+```
+[root@www ~]# LANG=C              <==由于与编码有关，先配置语系一下
+
+范例一：找出 /etc/ 底下以 cron 为开头的档名
+[root@www ~]# ll -d /etc/cron*    <==加上 -d 是为了仅显示目录而已
+
+范例二：找出 /etc/ 底下文件名『刚好是五个字母』的文件名
+[root@www ~]# ll -d /etc/?????    <==由于 ? 一定有一个，所以五个 ? 就对了
+
+范例三：找出 /etc/ 底下文件名含有数字的文件名
+[root@www ~]# ll -d /etc/*[0-9]*  <==记得中括号左右两边均需 *
+
+范例四：找出 /etc/ 底下，档名开头非为小写字母的文件名：
+[root@www ~]# ll -d /etc/[^a-z]*  <==注意中括号左边没有 *
+
+范例五：将范例四找到的文件复制到 /tmp 中
+[root@www ~]# cp -a /etc/[^a-z]* /tmp
+```
+
 ### Special Characters
 
 | Symbol | Meaning |
