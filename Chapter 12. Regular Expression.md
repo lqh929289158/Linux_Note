@@ -122,5 +122,43 @@ Line beginning and line ending symbol ^ $
 19:goooooogle yes
 ```
 
+> WARNING:  `grep -n 'o*' regular_express.txt` will grep all data in the file because `o*` means that null character is OK!
 
+```
+# Find all strings begin with 'g' and end with 'g'
+[root@www ~]# grep -n 'g.*g' regular_express.txt
+1:"Open Source" is a good mechanism to develop programs.
+14:The gd software is a library for drafting programs.
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+20:go! go! Let's go.
 
+# Find all number
+[root@www ~]# grep -n '[0-9][0-9]*' regular_express.txt
+5:However, this dress is about $ 3183 dollars.
+15:You are the best is mean you are the no. 1.
+```
+
+Specific repeat times `{}`
+
+```
+# Since {} has special meaning in shell, we have to use escape symbol(\)
+
+# Find two 'o'
+[root@www ~]# grep -n 'o\{2\}' regular_express.txt
+1:"Open Source" is a good mechanism to develop programs.
+2:apple is my favorite food.
+3:Football game is not use feet only.
+9:Oh! The soup taste good.
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+
+# Find 2~5 'o'
+[root@www ~]# grep -n 'go\{2,5\}g' regular_express.txt
+18:google is the best tools for search keyword.
+
+# Find 2~INF 'o'
+[root@www ~]# grep -n 'go\{2,\}g' regular_express.txt
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+```
