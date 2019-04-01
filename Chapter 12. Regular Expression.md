@@ -176,7 +176,9 @@ Specific repeat times `{}`
 | \{n,m\} | repeat the character before for n~m times |
 
 > WARNING: Special character in bash, like `*` is **DIFFERENT** from the `*` in RE.
+
 > `*` in bash: 0~INF characters
+
 > `*` in RE: Repeat the character before for 0~INF times!
 
 ```
