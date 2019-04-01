@@ -162,3 +162,34 @@ Specific repeat times `{}`
 18:google is the best tools for search keyword.
 19:goooooogle yes!
 ```
+
+| Symbol | Meaning |
+| --- | --- |
+| ^word | word at begnning of a line |
+| word$ | word at end of a line |
+| . | any character |
+| \ | escape character |
+| * | repeat the character before it zero or more times |
+| \[list\] | one of the element in list |
+| \[n1-n2] | one of the element in the range(mainly 0-9, a-z, A-Z) |
+| \[^list] | except all elements in list |
+| \{n,m\} | repeat the character before for n~m times |
+
+> WARNING: Special character in bash, like `*` is **DIFFERENT** from the `*` in RE.
+> `*` in bash: 0~INF characters
+> `*` in RE: Repeat the character before for 0~INF times!
+
+```
+# For example, 
+
+#list all filenames begin with a
+ls -l a*
+
+#list all files of any name
+ls -l | grep 'a*'
+
+#list all filenames begin with a
+ls -l | grep '^a.*'
+```
+
+### sed
