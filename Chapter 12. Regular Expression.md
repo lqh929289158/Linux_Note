@@ -290,3 +290,19 @@ sed 's/[string to be replaced]/[string replaced to]/g'
 sed -i '/\.$/\!/g' regular_express.txt
 sed -i '$a # This is a test' regular_express.txt
 ```
+
+## 3. Extended Regular Expression
+
+```
+egrep
+```
+| Symbol | Meaning |
+| --- | --- |
+| \| | meaning: or. to find one or more strings to match. `gd|good` means `gd` or `good` |
+| + | repeat one or more times for the character before |
+| ? | zero or one the character before |
+| () | meaning: or(partially). `g(la|oo)d` means `glad` or `good` |
+| ()+ | group repeat one or more times `A(xyz)+C` means `Axyzxyz....xyzC`
+
+> NOTE: '!','>' are not special character.
+
