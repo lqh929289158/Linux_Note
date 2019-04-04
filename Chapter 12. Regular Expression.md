@@ -306,3 +306,37 @@ egrep
 
 > NOTE: '!','>' are not special character.
 
+## 4. Format of files
+
+### printf
+
+Almost the same as **printf** in C. Followed by variable to be printed.
+
+| Symbol | Meaning |
+| --- | --- |
+| %ns | n means the number of byte(character) |
+| %ni | n means the total digit of integer |
+| %N.nf | N:the digit number of all. n: the digit number after dot. |
+
+```
+
+范例一：将刚刚上头数据的文件 (printf.txt) 内容仅列出姓名与成绩：(用 [tab] 分隔)
+[root@www ~]# printf '%s\t %s\t %s\t %s\t %s\t \n' $(cat printf.txt)
+Name     Chinese         English         Math    Average
+DmTsai   80      60      92      77.33
+VBird    75      55      80      70.00
+Ken      60      90      70      73.33
+
+
+范例二：将上述数据关於第二行以后，分别以字串、整数、小数点来显示：
+[root@www ~]# printf '%10s %5i %5i %5i %8.2f \n' $(cat printf.txt |\
+> grep -v Name)
+    DmTsai    80    60    92    77.33
+     VBird    75    55    80    70.00
+       Ken    60    90    70    73.33
+
+范例三：列出 16 进位数值 45 代表的字节为何？
+[root@www ~]# printf '\x45\n'
+E
+```
+
