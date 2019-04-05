@@ -340,3 +340,96 @@ Ken      60      90      70      73.33
 E
 ```
 
+### awk
+
+Compared with `sed` that deal with data line by line, `awk` prefer to deal with data unit by unit.
+
+The segment symbols of unit are usually `\t` ` `
+
+```
+[root@www ~]# awk '条件类型1{动作1} 条件类型2{动作2} ...' filename
+
+[root@www ~]# last -n 5 <==仅取出前五行
+root     pts/1   192.168.1.100  Tue Feb 10 11:21   still logged in
+root     pts/1   192.168.1.100  Tue Feb 10 00:46 - 02:28  (01:41)
+root     pts/1   192.168.1.100  Mon Feb  9 11:41 - 18:30  (06:48)
+dmtsai   pts/1   192.168.1.100  Mon Feb  9 11:41 - 11:41  (00:00)
+root     tty1                   Fri Sep  5 14:09 - 14:10  (00:01)
+
+
+[root@www ~]# last -n 5 | awk '{print $1 "\t" $3}'
+root    192.168.1.100
+root    192.168.1.100
+root    192.168.1.100
+dmtsai  192.168.1.100
+root    Fri
+```
+
+| Symbol | Meaning |
+| --- | --- |
+| NF | the unit number of each line |
+| NR | the current line |
+| FS | segment symbol(default \[space\]) |
+
+```
+[root@www ~]# last -n 5| awk '{print $1 "\t lines: " NR "\t columns: " NF}'
+root     lines: 1        columns: 10
+root     lines: 2        columns: 10
+root     lines: 3        columns: 10
+dmtsai   lines: 4        columns: 10
+root     lines: 5        columns: 9
+# 注意喔，在 awk 内的 NR, NF 等变量要用大写，且不需要有钱字号 $ 啦！
+```
+
+Logical expression symbol
+
+| Symbol | Meaning |
+| --- | --- |
+| > | . |
+| < | . |
+| >= | . |
+| <= | . |
+| == | . |
+| != | . |
+
+```
+[root@www ~]# cat /etc/passwd | \
+> awk '{FS=":"} $3 < 10 {print $1 "\t " $3}'
+root:x:0:0:root:/root:/bin/bash
+bin      1
+daemon   2
+....(以下省略)....
+```
+
+> NOTE: The configuration of `{FS=":"}` will come into effect after line 1!!! You need `BEGIN` keyword to configure environment variable before deal with data.
+
+```
+[root@www ~]# cat /etc/passwd | \
+> awk 'BEGIN {FS=":"} $3 < 10 {print $1 "\t " $3}'
+root     0
+bin      1
+daemon   2
+......(以下省略)......
+```
+
+Arithmetic calculation
+```
+
+Name    1st     2nd     3th
+VBird   23000   24000   25000
+DMTsai  21000   20000   23000
+Bird2   43000   42000   41000
+
+[root@www ~]# cat pay.txt | \
+> awk 'NR==1{printf "%10s %10s %10s %10s %10s\n",$1,$2,$3,$4,"Total" }
+NR>=2{total = $2 + $3 + $4
+printf "%10s %10d %10d %10d %10.2f\n", $1, $2, $3, $4, total}'
+      Name        1st        2nd        3th      Total
+     VBird      23000      24000      25000   72000.00
+    DMTsai      21000      20000      23000   64000.00
+     Bird2      43000      42000      41000  126000.00
+```
+
+> NOTE: Use `;` or \[Enter\] to split multiple commands. (Including the actions in \{\}.)
+
+
