@@ -433,3 +433,78 @@ printf "%10s %10d %10d %10d %10.2f\n", $1, $2, $3, $4, total}'
 > NOTE: Use `;` or \[Enter\] to split multiple commands. (Including the actions in \{\}.)
 
 
+### diff
+
+Compare between files line by line. Usually used for different versions of the a file.
+
+```
+
+[root@www ~]# diff [-bBi] from-file to-file
+选项与参数：
+from-file ：一个档名，作为原始比对文件的档名；
+to-file   ：一个档名，作为目的比对文件的档名；
+注意，from-file 或 to-file 可以 - 取代，那个 - 代表『Standard input』之意。
+
+-b  ：忽略一行当中，仅有多个空白的差异(例如 "about me" 与 "about     me" 视为相同
+-B  ：忽略空白行的差异。
+-i  ：忽略大小写的不同。
+
+范例一：比对 passwd.old 与 passwd.new 的差异：
+[root@www test]# diff passwd.old passwd.new
+4d3    <==左边第四行被删除 (d) 掉了，基准是右边的第三行
+< adm:x:3:4:adm:/var/adm:/sbin/nologin  <==这边列出左边(<)文件被删除的那一行内容
+6c5    <==左边文件的第六行被取代 (c) 成右边文件的第五行
+< sync:x:5:0:sync:/sbin:/bin/sync  <==左边(<)文件第六行内容
+---
+> no six line                      <==右边(>)文件第五行内容
+# 很聪明吧！用 diff 就把我们刚刚的处理给比对完毕了！
+```
+
+### patch
+
+Used to update the old version of file.
+
+Make patch file.
+```
+范例一：以 /tmp/test 内的 passwd.old 与 passwd.new  制作补丁文件
+[root@www test]# diff -Naur passwd.old passwd.new > passwd.patch
+[root@www test]# cat passwd.patch
+--- passwd.old  2009-02-10 14:29:09.000000000 +0800 <==新旧文件的资讯
++++ passwd.new  2009-02-10 14:29:18.000000000 +0800
+@@ -1,9 +1,8 @@   <==新旧文件要修改数据的界定范围，旧档在 1-9 行，新档在 1-8 行
+ root:x:0:0:root:/root:/bin/bash
+ bin:x:1:1:bin:/bin:/sbin/nologin
+ daemon:x:2:2:daemon:/sbin:/sbin/nologin
+-adm:x:3:4:adm:/var/adm:/sbin/nologin      <==左侧文件删除
+ lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+-sync:x:5:0:sync:/sbin:/bin/sync           <==左侧文件删除
++no six line                               <==右侧新档加入
+ shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+ halt:x:7:0:halt:/sbin:/sbin/halt
+ mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+ ```
+ 
+ Use the patch file to update old version.
+ ```
+[root@www ~]# patch -pN < patch_file    <==升级
+[root@www ~]# patch -R -pN < patch_file <==还原
+选项与参数：
+-p  ：后面可以接『取消几层目录』的意思。
+-R  ：代表还原，将新的文件还原成原来旧的版本。
+
+范例二：将刚刚制作出来的 patch file 用来升级旧版数据
+[root@www test]# patch -p0 < passwd.patch
+patching file passwd.old
+[root@www test]# ll passwd*
+-rw-r--r-- 1 root root 1929 Feb 10 14:29 passwd.new
+-rw-r--r-- 1 root root 1929 Feb 10 15:12 passwd.old <==文件一模一样！
+
+范例三：恢复旧文件的内容
+[root@www test]# patch -R -p0 < passwd.patch
+[root@www test]# ll passwd*
+-rw-r--r-- 1 root root 1929 Feb 10 14:29 passwd.new
+-rw-r--r-- 1 root root 1986 Feb 10 15:18 passwd.old
+# 文件就这样恢复成为旧版本罗
+```
+ 
+
