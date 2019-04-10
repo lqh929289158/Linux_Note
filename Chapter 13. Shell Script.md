@@ -104,3 +104,38 @@ touch "$file2"
 touch "$file3"
 ```
 
+### Arithmetic Operation
+
+Many ways to evaluate expression.
+
+- 1. `$((expression))`
+- 2. `declare -i var=[expression]`
+
+```
+
+[root@www scripts]# vi sh04.sh
+#!/bin/bash
+# Program:
+#	User inputs 2 integer numbers; program will cross these two numbers.
+# History:
+# 2005/08/23	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+echo -e "You SHOULD input 2 numbers, I will cross them! \n"
+read -p "first number:  " firstnu
+read -p "second number: " secnu
+total=$(($firstnu*$secnu))
+echo -e "\nThe result of $firstnu x $secnu is ==> $total"
+```
+Or we can use:
+```
+declare -i total=$firstnu*$secnu
+```
+Or
+```
+var=$((运算内容))
+```
+
+> NOTE: When you use `$((expression))`, there is no problem if you add \[space\] in expression.
+
+
