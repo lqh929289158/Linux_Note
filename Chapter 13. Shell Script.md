@@ -138,4 +138,14 @@ var=$((运算内容))
 
 > NOTE: When you use `$((expression))`, there is no problem if you add \[space\] in expression.
 
+### How to execute script
+
+- sh xxx.sh
+- source xxx.sh
+  - **The environment variables will be left to the father program.**
+- ./xxx.sh
+  - the script will create a **new bash environment** to execute itself.
+  - in another word, the script is executed in the bash of a subprogram.
+  - The key point here: **The environment variables and results defined in subprogram will not pass to father program!**
+
 
