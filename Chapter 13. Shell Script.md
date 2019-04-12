@@ -148,4 +148,32 @@ var=$((运算内容))
   - in another word, the script is executed in the bash of a subprogram.
   - The key point here: **The environment variables and results defined in subprogram will not pass to father program!**
 
+## 3. Judgement and Branch
 
+Review:
+
+- `$?` the return value of the last command.
+- `cmd1 && cmd2` if cmd1(`$?` == 0) then cmd2
+- `cmd1 || cmd2` if cmd1(`$?` != 0) then not cmd2
+- `test -e /dmtsai` test whether `/dmtsai` exists or not
+
+```
+[root@www ~]# test -e /dmtsai && echo "exist" || echo "Not exist"
+Not exist  <==结果显示不存在啊！
+```
+
+### test
+
+```
+test -e filename
+```
+| Parameter | Meaning |
+| --- | --- |
+| **-e** | **whether the name exists or not** |
+| **-f** | **whether the name exists and is file** |
+| **-d** | **whether the name exists and is directory** |
+| -b | whether the name exists and is a block device |
+| -c | whether the name exists and is a character device |
+| -S | whether the name exists and is a Socket |
+| -p | whether the name exists and is a FIFO pipe |
+| -L | whether the name exists and is a Link file |
