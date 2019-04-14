@@ -167,7 +167,7 @@ Not exist  <==结果显示不存在啊！
 ```
 test -e filename
 ```
-| Parameter | Meaning |
+| para | file exist and type |
 | --- | --- |
 | **-e** | **whether the name exists or not** |
 | **-f** | **whether the name exists and is file** |
@@ -177,3 +177,50 @@ test -e filename
 | -S | whether the name exists and is a Socket |
 | -p | whether the name exists and is a FIFO pipe |
 | -L | whether the name exists and is a Link file |
+
+| para | file accessability |
+| --- | --- |
+| -r | can be read or not |
+| -w | can be write or not |
+| -x | can be execute or not |
+| -u | SUID? |
+| -g | SGID? |
+| -k | Sticky bit? |
+| -s | null file? |
+
+```
+test file1 -nt file2
+```
+| para | file comparasion |
+| --- | --- |
+| -nt | file1 newer than file2? |
+| -ot | file1 older than file2? |
+| -ef | file1 the same file with file2?(the same inode?) |
+
+```
+test n1 -eq n2
+```
+| para | integer comarasion |
+| --- | --- |
+| -eq | n1 == n2 |
+| -ne | n1 != n2 |
+| -gt | n1 > n2 |
+| -lt | n1 < n2 |
+| -ge | n1 >= n2 |
+| -le | n1 <= n2 |
+
+| cmd | string comparasion |
+| --- | --- |
+| test -z string | string =="" ? |
+| test -n string | string !="" ? |
+| test str1 = str2 | str1 == str2 ? |
+| test str1 != str2 | str1 != str2 ? |
+
+```
+test -r filename -a -x filename
+```
+| para | multiple condition |
+| --- | --- |
+| -a | and |
+| -o | or |
+| ! | not `test ! -x file` not have execution right |
