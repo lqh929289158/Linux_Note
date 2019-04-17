@@ -224,3 +224,68 @@ test -r filename -a -x filename
 | -a | and |
 | -o | or |
 | ! | not `test ! -x file` not have execution right |
+
+```
+
+[root@www scripts]# vi sh05.sh
+#!/bin/bash
+# Program:
+#	User input a filename, program will check the flowing:
+#	1.) exist? 2.) file/directory? 3.) file permissions 
+# History:
+# 2005/08/25	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+# 1. 让使用者输入档名，并且判断使用者是否真的有输入字串？
+echo -e "Please input a filename, I will check the filename's type and \
+permission. \n\n"
+read -p "Input a filename : " filename
+test -z $filename && echo "You MUST input a filename." && exit 0
+# 2. 判断文件是否存在？若不存在则显示信息并结束脚本
+test ! -e $filename && echo "The filename '$filename' DO NOT exist" && exit 0
+# 3. 开始判断文件类型与属性
+test -f $filename && filetype="regulare file"
+test -d $filename && filetype="directory"
+test -r $filename && perm="readable"
+test -w $filename && perm="$perm writable"
+test -x $filename && perm="$perm executable"
+# 4. 开始输出资讯！
+echo "The filename: $filename is a $filetype"
+echo "And the permissions are : $perm"
+```
+
+### `[]` judgement symbol
+
+```
+[root@www ~]# [ -z "$HOME" ] ; echo $?
+```
+
+> WARNING: Use **\[Space\]** to split each element in the `[]`
+
+```
+[  "$HOME"  ==  "$MAIL"  ]
+```
+
+- Split all elements with **\[Space\]**
+- Use **""** for all variables.
+- Use **""** for all constants.
+
+```
+[root@www scripts]# vi sh06.sh
+#!/bin/bash
+# Program:
+# 	This program shows the user's choice
+# History:
+# 2005/08/25	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+read -p "Please input (Y/N): " yn
+[ "$yn" == "Y" -o "$yn" == "y" ] && echo "OK, continue" && exit 0
+[ "$yn" == "N" -o "$yn" == "n" ] && echo "Oh, interrupt!" && exit 0
+echo "I don't know what your choice is" && exit 0
+```
+
+
+
