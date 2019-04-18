@@ -287,5 +287,85 @@ read -p "Please input (Y/N): " yn
 echo "I don't know what your choice is" && exit 0
 ```
 
+### Default variable `$0,$1,...`
+
+```
+[root@www ~]# file /etc/init.d/syslog
+/etc/init.d/syslog: Bourne-Again shell script text executable
+# 使用 file 来查询后，系统告知这个文件是个 bash 的可运行 script 喔！
+[root@www ~]# /etc/init.d/syslog restart
+[root@www ~]# /etc/init.d/syslog stop
+```
+
+```
+# $n means the n-th parameter
+/path/to/scriptname  opt1  opt2  opt3  opt4 
+       $0             $1    $2    $3    $4
+```
+
+- `$0`: the name of the script executed
+- `$n`: the n-th parameter
+- `$#`: the number of parameters followed
+- `$@`: the string of all parameters, splited by \[Space\].
+
+```
+
+[root@www scripts]# vi sh07.sh
+#!/bin/bash
+# Program:
+#	Program shows the script name, parameters...
+# History:
+# 2009/02/17	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+echo "The script name is        ==> $0"
+echo "Total parameter number is ==> $#"
+[ "$#" -lt 2 ] && echo "The number of parameter is less than 2.  Stop here." \
+	&& exit 0
+echo "Your whole parameter is   ==> '$@'"
+echo "The 1st parameter         ==> $1"
+echo "The 2nd parameter         ==> $2"
 
 
+
+[root@www scripts]# sh sh07.sh theone haha quot
+The script name is        ==> sh07.sh            <==档名
+Total parameter number is ==> 3                  <==果然有三个参数
+Your whole parameter is   ==> 'theone haha quot' <==参数的内容全部
+The 1st parameter         ==> theone             <==第一个参数
+The 2nd parameter         ==> haha               <==第二个参数
+```
+
+### shift
+
+left shift parameters. Maybe you can consume the parameters by how many you want, not to specify the sequence number of them.
+```
+[root@www scripts]# vi sh08.sh
+#!/bin/bash
+# Program:
+#	Program shows the effect of shift function.
+# History:
+# 2009/02/17	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+echo "Total parameter number is ==> $#"
+echo "Your whole parameter is   ==> '$@'"
+shift   # 进行第一次『一个变量的 shift 』
+echo "Total parameter number is ==> $#"
+echo "Your whole parameter is   ==> '$@'"
+shift 3 # 进行第二次『三个变量的 shift 』
+echo "Total parameter number is ==> $#"
+echo "Your whole parameter is   ==> '$@'"
+
+
+
+[root@www scripts]# sh sh08.sh one two three four five six <==给予六个参数
+Total parameter number is ==> 6   <==最原始的参数变量情况
+Your whole parameter is   ==> 'one two three four five six'
+Total parameter number is ==> 5   <==第一次偏移，看底下发现第一个 one 不见了
+Your whole parameter is   ==> 'two three four five six'
+Total parameter number is ==> 2   <==第二次偏移掉三个，two three four 不见了
+Your whole parameter is   ==> 'five six'
+```
