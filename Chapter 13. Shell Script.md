@@ -369,3 +369,98 @@ Your whole parameter is   ==> 'two three four five six'
 Total parameter number is ==> 2   <==第二次偏移掉三个，two three four 不见了
 Your whole parameter is   ==> 'five six'
 ```
+
+## 4. Condition judgement and branch
+
+### `if` and `then`
+```
+if [ 条件判断式 ]; then
+	当条件判断式成立时，可以进行的命令工作内容；
+fi   <==将 if 反过来写，就成为 fi 啦！结束 if 之意！
+```
+
+The logical relation **inside \[\]** use `-o -a`.
+The logical relation **outside \[\]** use `|| &&`.
+
+```
+[ "$yn" == "Y" -o "$yn" == "y" ]
+[ "$yn" == "Y" ] || [ "$yn" == "y" ]
+```
+
+```
+[root@www scripts]# cp sh06.sh sh06-2.sh  <==用改的比较快！
+[root@www scripts]# vi sh06-2.sh
+#!/bin/bash
+# Program:
+#       This program shows the user's choice
+# History:
+# 2005/08/25    VBird   First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+read -p "Please input (Y/N): " yn
+
+if [ "$yn" == "Y" ] || [ "$yn" == "y" ]; then
+	echo "OK, continue"
+	exit 0
+fi
+if [ "$yn" == "N" ] || [ "$yn" == "n" ]; then
+	echo "Oh, interrupt!"
+	exit 0
+fi
+echo "I don't know what your choice is" && exit 0
+```
+
+### `if` and `then` and `elif` and `else`
+
+```
+# 多个条件判断 (if ... elif ... elif ... else) 分多种不同情况运行
+if [ 条件判断式一 ]; then
+	当条件判断式一成立时，可以进行的命令工作内容；
+elif [ 条件判断式二 ]; then
+	当条件判断式二成立时，可以进行的命令工作内容；
+else
+	当条件判断式一与二均不成立时，可以进行的命令工作内容；
+fi
+```
+```
+[root@www scripts]# cp sh06-2.sh sh06-3.sh
+[root@www scripts]# vi sh06-3.sh
+#!/bin/bash
+# Program:
+#       This program shows the user's choice
+# History:
+# 2005/08/25    VBird   First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+read -p "Please input (Y/N): " yn
+
+if [ "$yn" == "Y" ] || [ "$yn" == "y" ]; then
+	echo "OK, continue"
+elif [ "$yn" == "N" ] || [ "$yn" == "n" ]; then
+	echo "Oh, interrupt!"
+else
+	echo "I don't know what your choice is"
+fi
+```
+```
+
+[root@www scripts]# vi sh09.sh
+#!/bin/bash
+# Program:
+#	Check $1 is equal to "hello"
+# History:
+# 2005/08/28	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+if [ "$1" == "hello" ]; then
+	echo "Hello, how are you ?"
+elif [ "$1" == "" ]; then
+	echo "You MUST input parameters, ex> {$0 someword}"
+else
+	echo "The only parameter is 'hello', ex> {$0 hello}"
+fi
+```
+
