@@ -464,3 +464,86 @@ else
 fi
 ```
 
+### Using `case ... esac`
+
+```
+
+case  $变量名称 in   <==关键字为 case ，还有变量前有钱字号
+  "第一个变量内容")   <==每个变量内容建议用双引号括起来，关键字则为小括号 )
+	程序段
+	;;            <==每个类别结尾使用两个连续的分号来处理！
+  "第二个变量内容")
+	程序段
+	;;
+  *)                  <==最后一个变量内容都会用 * 来代表所有其他值
+	不包含第一个变量内容与第二个变量内容的其他程序运行段
+	exit 1
+	;;
+esac                  <==最终的 case 结尾！『反过来写』思考一下！
+```
+
+```
+
+[root@www scripts]# vi sh09-2.sh
+#!/bin/bash
+# Program:
+# 	Show "Hello" from $1.... by using case .... esac
+# History:
+# 2005/08/29	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+case $1 in
+  "hello")
+	echo "Hello, how are you ?"
+	;;
+  "")
+	echo "You MUST input parameters, ex> {$0 someword}"
+	;;
+  *)   # 其实就相当於万用字节，0~无穷多个任意字节之意！
+	echo "Usage $0 {hello}"
+	;;
+esac
+```
+
+### Use `function`
+
+```
+function fname() {
+	程序段
+}
+```
+
+```
+[root@www scripts]# vi sh12-2.sh
+#!/bin/bash
+# Program:
+#	Use function to repeat information.
+# History:
+# 2005/08/29	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+function printit(){
+	echo -n "Your choice is "     # 加上 -n 可以不断行继续在同一行显示
+}
+
+echo "This program will print your selection !"
+case $1 in
+  "one")
+	printit; echo $1 | tr 'a-z' 'A-Z'  # 将参数做大小写转换！
+	;;
+  "two")
+	printit; echo $1 | tr 'a-z' 'A-Z'
+	;;
+  "three")
+	printit; echo $1 | tr 'a-z' 'A-Z'
+	;;
+  *)
+	echo "Usage $0 {one|two|three}"
+	;;
+esac
+```
+
+Function has its own local variable, also specified by `$0,$1,...`. `$0` is the name of the function?. The `$1,$2,...` are the parameters.
+
