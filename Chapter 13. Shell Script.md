@@ -577,3 +577,193 @@ case $1 in
 	;;
 esac
 ```
+
+## 5. Loop 
+
+### `while..do..done..until..do..done`
+
+```
+while [ condition ]  <==中括号内的状态就是判断式
+do            <==do 是回圈的开始！
+	程序段落
+done          <==done 是回圈的结束
+
+until [ condition ]
+do
+	程序段落
+done
+```
+
+```
+[root@www scripts]# vi sh13.sh
+#!/bin/bash
+# Program:
+#	Repeat question until user input correct answer.
+# History:
+# 2005/08/29	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+while [ "$yn" != "yes" -a "$yn" != "YES" ]
+do
+	read -p "Please input yes/YES to stop this program: " yn
+done
+echo "OK! you input the correct answer."
+
+
+[root@www scripts]# vi sh13-2.sh
+#!/bin/bash
+# Program:
+#	Repeat question until user input correct answer.
+# History:
+# 2005/08/29	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+until [ "$yn" == "yes" -o "$yn" == "YES" ]
+do
+	read -p "Please input yes/YES to stop this program: " yn
+done
+echo "OK! you input the correct answer."
+```
+
+```
+[root@www scripts]# vi sh14.sh
+#!/bin/bash
+# Program:
+#	Use loop to calculate "1+2+3+...+100" result.
+# History:
+# 2005/08/29	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+s=0  # 这是加总的数值变量
+i=0  # 这是累计的数值，亦即是 1, 2, 3....
+while [ "$i" != "100" ]
+do
+	i=$(($i+1))   # 每次 i 都会添加 1 
+	s=$(($s+$i))  # 每次都会加总一次！
+done
+echo "The result of '1+2+3+...+100' is ==> $s"
+```
+
+### `for...do...done`
+
+```
+for var in con1 con2 con3 ...
+do
+	程序段
+done
+```
+
+```
+[root@www scripts]# vi sh15.sh
+#!/bin/bash
+# Program:
+# 	Using for .... loop to print 3 animals
+# History:
+# 2005/08/29	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+for animal in dog cat elephant
+do
+	echo "There are ${animal}s.... "
+done
+```
+```
+[root@www scripts]# vi sh16.sh
+#!/bin/bash
+# Program
+#       Use id, finger command to check system account's information.
+# History
+# 2009/02/18    VBird   first release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+users=$(cut -d ':' -f1 /etc/passwd)  # 撷取帐号名称
+for username in $users               # 开始回圈进行！
+do
+        id $username
+        finger $username
+done
+```
+```
+[root@www scripts]# vi sh18.sh
+#!/bin/bash
+# Program:
+#	User input dir name, I find the permission of files.
+# History:
+# 2005/08/29	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+# 1. 先看看这个目录是否存在啊？
+read -p "Please input a directory: " dir
+if [ "$dir" == "" -o ! -d "$dir" ]; then
+	echo "The $dir is NOT exist in your system."
+	exit 1
+fi
+
+# 2. 开始测试文件罗～
+filelist=$(ls $dir)        # 列出所有在该目录下的文件名称
+for filename in $filelist
+do
+	perm=""
+	test -r "$dir/$filename" && perm="$perm readable"
+	test -w "$dir/$filename" && perm="$perm writable"
+	test -x "$dir/$filename" && perm="$perm executable"
+	echo "The file $dir/$filename's permission is $perm "
+done
+```
+
+### seq
+```
+[root@www scripts]# vi sh17.sh
+#!/bin/bash
+# Program
+#       Use ping command to check the network's PC state.
+# History
+# 2009/02/18    VBird   first release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+network="192.168.1"              # 先定义一个网域的前面部分！
+for sitenu in $(seq 1 100)       # seq 为 sequence(连续) 的缩写之意
+do
+	# 底下的程序在取得 ping 的回传值是正确的还是失败的！
+        ping -c 1 -w 1 ${network}.${sitenu} &> /dev/null && result=0 || result=1
+	# 开始显示结果是正确的启动 (UP) 还是错误的没有连通 (DOWN)
+        if [ "$result" == 0 ]; then
+                echo "Server ${network}.${sitenu} is UP."
+        else
+                echo "Server ${network}.${sitenu} is DOWN."
+        fi
+done
+```
+
+### `for...do...done` data process
+
+```
+for (( 初始值; 限制值; 运行步阶 ))
+do
+	程序段
+done
+```
+```
+[root@www scripts]# vi sh19.sh
+#!/bin/bash
+# Program:
+# 	Try do calculate 1+2+....+${your_input}
+# History:
+# 2005/08/29	VBird	First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+read -p "Please input a number, I will count for 1+2+...+your_input: " nu
+
+s=0
+for (( i=1; i<=$nu; i=i+1 ))
+do
+	s=$(($s+$i))
+done
+echo "The result of '1+2+3+...+$nu' is ==> $s"
+```
