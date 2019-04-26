@@ -48,3 +48,22 @@ adm:x:3:4:adm:/var/adm:/sbin/nologin
 5. User information.
 6. home directory. `~/`
 7. Shell. Used to specify shell environment. For example, default **BASH** environment is specified here. `/sbin/nologin` means no shell!
+
+### structure of `/etc/shadow`
+
+```
+[root@www ~]# head -n 4 /etc/shadow
+root:$1$/30QpE5e$y9N/D0bh6rAACBEz.hqo00:14126:0:99999:7:::  <==底下说明用
+bin:*:14126:0:99999:7:::
+daemon:*:14126:0:99999:7:::
+adm:*:14126:0:99999:7:::
+```
+1. Account name. Must be the same as the name in `/etc/passwd`.
+2. Password. Encrypted. Only read and written by **root**.
+3. Last date of changing password. The days from 1970/1/1.
+4. How many days the password can not be changed. Based on **#3**.
+5. How many days you need to change password in.
+6. How many days warning occurs before the password change deadline.
+7. How many days you can still use your account before the password out of date.
+8. Ouf of date.
+9. Reserved.
