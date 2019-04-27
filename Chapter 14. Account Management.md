@@ -67,3 +67,20 @@ adm:*:14126:0:99999:7:::
 7. How many days you can still use your account before the password out of date.
 8. Ouf of date.
 9. Reserved.
+
+### structure of `/etc/group`
+
+4 columns, each line for a group.
+```
+[root@www ~]# head -n 4 /etc/group
+root:x:0:root
+bin:x:1:root,bin,daemon
+daemon:x:2:root,bin,daemon
+sys:x:3:root,bin,adm
+```
+1. Group name.
+2. Group password. Stored in `/etc/gshadow`
+3. GID.
+4. Account names in this group.
+
+### Effective group and initial group
