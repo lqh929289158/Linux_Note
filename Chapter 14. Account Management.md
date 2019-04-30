@@ -178,4 +178,57 @@ What the `useradd [Account name]` will do?
 - `/etc/gshadow`: A line for the new group without password by default.
 - `/home`: A new directory with the same name with account name. Access control: **700**.
 
+What the `useradd` will refer to?(Default configuration)
+- `/etc/default/useradd`
+- `/etc/login.defs`
+- `/etc/skel/*`
 
+### `useradd` manual
+
+Show the default configuration of `useradd`(`/etc/default/useradd`).
+```
+[root@www ~]# useradd -D
+GROUP=100		<==默认的群组
+HOME=/home		<==默认的家目录所在目录
+INACTIVE=-1		<==口令失效日，在 shadow 内的第 7 栏
+EXPIRE=			<==账号失效日，在 shadow 内的第 8 栏
+SHELL=/bin/bash		<==默认的 shell
+SKEL=/etc/skel		<==用户家目录的内容数据参考目录
+CREATE_MAIL_SPOOL=yes   <==是否主动帮使用者创建邮件信箱(mailbox)
+```
+
+- `GROUP=100`. The GID of **default group**.
+  - **Private group strategy**. Each account has its own group and home directory with **700** access control. Example distributions: RHEL, Fedora, **CentOS**.
+  - Public group strategy. Each account belongs to group **users** and home directory with **755** access control. Example distributions: SuSE.
+- `HOME=/home`: Base directory of home directory.
+- `INACTIVE=-1`: The password will be invalid or not after out of date.
+  - 0: Invalid soon after due.
+  - -1: Never invalid.
+  - n: Valid in n days after due.
+- `EXPIRE=`: Date of due.
+- `SHELL=/bin/bash`: Default program name of shell.
+  - `/bin/bash`: Normal.
+  - `/sbin/nologin`: The new user can not login but he can only use email function.(Mail server)
+- `SKEL=/etc/skel`: Reference directory of home directory. All files in `SKEL` will be copied to the new created home directory.
+- `CREATE_MAIL_SPOOL=yes`: Create mailbox for the user or not. Check in `/var/spool/mail/`
+
+### `/etc/login.defs`
+```
+
+MAIL_DIR        /var/spool/mail	<==用户默认邮件信箱放置目录
+
+PASS_MAX_DAYS   99999	<==/etc/shadow 内的第 5 栏，多久需变更口令日数
+PASS_MIN_DAYS   0	<==/etc/shadow 内的第 4 栏，多久不可重新配置口令日数
+PASS_MIN_LEN    5	<==口令最短的字符长度，已被 pam 模块取代，失去效用！
+PASS_WARN_AGE   7	<==/etc/shadow 内的第 6 栏，过期前会警告的日数
+
+UID_MIN         500	<==使用者最小的 UID，意即小于 500 的 UID 为系统保留
+UID_MAX       60000	<==使用者能够用的最大 UID
+GID_MIN         500	<==使用者自定义组的最小 GID，小于 500 为系统保留
+GID_MAX       60000	<==使用者自定义组的最大 GID
+
+CREATE_HOME     yes	<==在不加 -M 及 -m 时，是否主动创建用户家目录？
+UMASK           077     <==用户家目录创建的 umask ，因此权限会是 700
+USERGROUPS_ENAB yes     <==使用 userdel 删除时，是否会删除初始群组
+MD5_CRYPT_ENAB yes      <==口令是否经过 MD5 的加密机制处理
+```
