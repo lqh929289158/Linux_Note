@@ -232,3 +232,92 @@ UMASK           077     <==用户家目录创建的 umask ，因此权限会是 
 USERGROUPS_ENAB yes     <==使用 userdel 删除时，是否会删除初始群组
 MD5_CRYPT_ENAB yes      <==口令是否经过 MD5 的加密机制处理
 ```
+
+### `passwd` configure password
+
+```
+[root@www ~]# passwd [--stdin]  <==所有人均可使用来改自己的口令
+[root@www ~]# passwd [-l] [-u] [--stdin] [-S] \
+>  [-n 日数] [-x 日数] [-w 日数] [-i 日期] 账号 <==root 功能
+选项与参数：
+--stdin ：可以透过来自前一个管线的数据，作为口令输入，对 shell script 有帮助！
+-l  ：是 Lock 的意思，会将 /etc/shadow 第二栏最前面加上 ! 使口令失效；
+-u  ：与 -l 相对，是 Unlock 的意思！
+-S  ：列出口令相关参数，亦即 shadow 文件内的大部分信息。
+-n  ：后面接天数，shadow 的第 4 字段，多久不可修改口令天数
+-x  ：后面接天数，shadow 的第 5 字段，多久内必须要更动口令
+-w  ：后面接天数，shadow 的第 6 字段，口令过期前的警告天数
+-i  ：后面接『日期』，shadow 的第 7 字段，口令失效日期
+
+范例一：请 root 给予 vbird2 口令
+[root@www ~]# passwd vbird2
+Changing password for user vbird2.
+New UNIX password: <==这里直接输入新的口令，屏幕不会有任何反应
+BAD PASSWORD: it is WAY too short <==口令太简单或过短的错误！
+Retype new UNIX password:  <==再输入一次同样的口令
+passwd: all authentication tokens updated successfully.  <==竟然还是成功修改了!
+```
+
+> WARNING: When you are **root**, use `passwd [account]` to configure password for others and `passwd` for itself. When you are a normal user, use `passwd` to configure password for yourself!
+
+### `chage`
+
+```
+[root@www ~]# chage [-ldEImMW] 账号名
+选项与参数：
+-l ：列出该账号的详细口令参数；
+-d ：后面接日期，修改 shadow 第三字段(最近一次更改口令的日期)，格式 YYYY-MM-DD
+-E ：后面接日期，修改 shadow 第八字段(账号失效日)，格式 YYYY-MM-DD
+-I ：后面接天数，修改 shadow 第七字段(口令失效日期)
+-m ：后面接天数，修改 shadow 第四字段(口令最短保留天数)
+-M ：后面接天数，修改 shadow 第五字段(口令多久需要进行变更)
+-W ：后面接天数，修改 shadow 第六字段(口令过期前警告日期)
+
+范例一：列出 vbird2 的详细口令参数
+[root@www ~]# chage -l vbird2
+Last password change                               : Feb 26, 2009
+Password expires                                   : Apr 27, 2009
+Password inactive                                  : May 07, 2009
+Account expires                                    : never
+Minimum number of days between password change     : 0
+Maximum number of days between password change     : 60
+Number of days of warning before password expires  : 7
+```
+### `usermod`
+
+```
+
+[root@www ~]# usermod [-cdegGlsuLU] username
+选项与参数：
+-c  ：后面接账号的说明，即 /etc/passwd 第五栏的说明栏，可以加入一些账号的说明。
+-d  ：后面接账号的家目录，即修改 /etc/passwd 的第六栏；
+-e  ：后面接日期，格式是 YYYY-MM-DD 也就是在 /etc/shadow 内的第八个字段数据啦！
+-f  ：后面接天数，为 shadow 的第七字段。
+-g  ：后面接初始群组，修改 /etc/passwd 的第四个字段，亦即是 GID 的字段！
+-G  ：后面接次要群组，修改这个使用者能够支持的群组，修改的是 /etc/group 啰～
+-a  ：与 -G 合用，可『添加次要群组的支持』而非『配置』喔！
+-l  ：后面接账号名称。亦即是修改账号名称， /etc/passwd 的第一栏！
+-s  ：后面接 Shell 的实际文件，例如 /bin/bash 或 /bin/csh 等等。
+-u  ：后面接 UID 数字啦！即 /etc/passwd 第三栏的数据；
+-L  ：暂时将用户的口令冻结，让他无法登陆。其实仅改 /etc/shadow 的口令栏。
+-U  ：将 /etc/shadow 口令栏的 ! 拿掉，解冻啦！
+```
+
+### `userdel`
+
+What will it delete?
+
+- Entry in `/etc/passwd` `/etc/shadow`
+- Entry in `/etc/group` `/etc/gshadow`
+- Data in `/home/username` `/var/spool/mail/username` ...
+
+```
+[root@www ~]# userdel [-r] username
+选项与参数：
+-r  ：连同用户的家目录也一起删除
+
+范例一：删除 vbird2 ，连同家目录一起删除
+[root@www ~]# userdel -r vbird2
+```
+
+> WARNING: You can just disable an account by setting the expire date to **0** in `/etc/shadow`. And all data will be kept in this case. If you really want to delete all data of an account, you are recommened to use `find / -user [username]` to confirm all files you will delete.
