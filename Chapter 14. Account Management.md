@@ -321,3 +321,107 @@ What will it delete?
 ```
 
 > WARNING: You can just disable an account by setting the expire date to **0** in `/etc/shadow`. And all data will be kept in this case. If you really want to delete all data of an account, you are recommened to use `find / -user [username]` to confirm all files you will delete.
+
+## User function
+
+### `finger`
+
+```
+[root@www ~]# finger [-s] username
+选项与参数：
+-s  ：仅列出用户的账号、全名、终端机代号与登陆时间等等；
+-m  ：列出与后面接的账号相同者，而不是利用部分比对 (包括全名部分)
+
+范例一：观察 vbird1 的用户相关账号属性
+[root@www ~]# finger vbird1
+Login: vbird1                           Name: (null)
+Directory: /home/vbird1                 Shell: /bin/bash
+Never logged in.
+No mail.
+No Plan.
+```
+
+- Login: Account name. (1st part in `passwd`)
+- Name: Full name. (5th part in `passwd`)
+- Directory: Home.
+- Shell: Shell program directory.
+- Never logged in: 
+- No mail: `/var/spool/mail`. 
+- No plan: `~vbird1/.plan`
+
+```
+范例二：利用 vbird1 创建自己的计划档
+[vbird1@www ~]$ echo "I will study Linux during this year." > ~/.plan
+[vbird1@www ~]$ finger vbird1
+Login: vbird1                           Name: (null)
+Directory: /home/vbird1                 Shell: /bin/bash
+Never logged in.
+No mail.
+Plan:
+I will study Linux during this year.
+
+范例三：找出目前在系统上面登陆的用户与登陆时间
+[vbird1@www ~]$ finger
+Login     Name       Tty      Idle  Login Time   Office     Office Phone
+root      root       tty1           Feb 26 09:53
+vbird1               tty2           Feb 26 15:21
+```
+
+### `chfn` modify finger
+
+### `chsh` modify shell
+
+```
+
+[vbird1@www ~]$ chsh [-ls]
+选项与参数：
+-l  ：列出目前系统上面可用的 shell ，其实就是 /etc/shells 的内容！
+-s  ：配置修改自己的 Shell 啰
+
+范例一：用 vbird1 的身份列出系统上所有合法的 shell，并且指定 csh 为自己的 shell
+[vbird1@www ~]$ chsh -l
+/bin/sh
+/bin/bash
+/sbin/nologin  <==所谓：合法不可登陆的 Shell 就是这玩意！
+/bin/tcsh
+/bin/csh       <==这就是 C shell 啦！
+/bin/ksh
+# 其实上面的信息就是我们在 bash 中谈到的 /etc/shells 啦！
+
+[vbird1@www ~]$ chsh -s /bin/csh; grep vbird1 /etc/passwd
+Changing shell for vbird1.
+Password:  <==确认身份，请输入 vbird1 的口令
+Shell changed.
+vbird1:x:504:505:VBird Tsai test,Dic in Ksu. Tainan,06-2727175#356,06-1234567:
+/home/vbird1:/bin/csh
+
+[vbird1@www ~]$ chsh -s /bin/bash
+# 测试完毕后，立刻改回来！
+
+[vbird1@www ~]$ ll $(which chsh)
+-rws--x--x 1 root root 19128 May 25  2008 /usr/bin/chsh
+```
+
+### `id` mainly for UID/GID
+
+```
+
+[root@www ~]# id [username]
+
+范例一：查阅 root 自己的相关 ID 信息！
+[root@www ~]# id
+uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),
+10(wheel) context=root:system_r:unconfined_t:SystemLow-SystemHigh
+# 上面信息其实是同一行的数据！包括会显示 UID/GID 以及支持的所有群组！
+# 至于后面那个 context=... 则是 SELinux 的内容，先不要理会他！
+
+范例二：查阅一下 vbird1 吧～
+[root@www ~]# id vbird1
+uid=504(vbird1) gid=505(vbird1) groups=505(vbird1) context=root:system_r:
+unconfined_t:SystemLow-SystemHigh
+
+[root@www ~]# id vbird100
+id: vbird100: No such user  <== id 这个命令也可以用来判断系统上面有无某账号！
+```
+
+
