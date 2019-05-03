@@ -424,4 +424,102 @@ unconfined_t:SystemLow-SystemHigh
 id: vbird100: No such user  <== id 这个命令也可以用来判断系统上面有无某账号！
 ```
 
+## Add and delete group
+
+### `groupadd`
+
+```
+[root@www ~]# groupadd [-g gid] [-r] 组名
+选项与参数：
+-g  ：后面接某个特定的 GID ，用来直接给予某个 GID ～
+-r  ：创建系统群组啦！与 /etc/login.defs 内的 GID_MIN 有关。
+
+范例一：新建一个群组，名称为 group1
+[root@www ~]# groupadd group1
+[root@www ~]# grep group1 /etc/group /etc/gshadow
+/etc/group:group1:x:702:
+/etc/gshadow:group1:!::
+# 群组的 GID 也是会由 500 以上最大 GID+1 来决定！
+```
+
+> NOTE: It is recommended to use `groupadd -r [group name]` to create groups nothing to do with private groups.
+
+### `groupmod`
+
+```
+[root@www ~]# groupmod [-g gid] [-n group_name] 群组名
+选项与参数：
+-g  ：修改既有的 GID 数字；
+-n  ：修改既有的组名
+
+范例一：将刚刚上个命令创建的 group1 名称改为 mygroup ， GID 为 201
+[root@www ~]# groupmod -g 201 -n mygroup group1
+[root@www ~]# grep mygroup /etc/group /etc/gshadow
+/etc/group:mygroup:x:201:
+/etc/gshadow:mygroup:!::
+```
+
+### `groupdel`
+
+```
+[root@www ~]# groupdel [groupname]
+
+范例一：将刚刚的 mygroup 删除！
+[root@www ~]# groupdel mygroup
+
+范例二：若要删除 vbird1 这个群组的话？
+[root@www ~]# groupdel vbird1
+groupdel: cannot remove user's primary group.
+```
+You can not delete a group which is someone's **initial group**!
+
+So, you can
+
+- modify GID of `vbird1`
+- delete account `vbird1`
+
+### `gpasswd`
+
+```
+# 关于系统管理员(root)做的动作：
+[root@www ~]# gpasswd groupname
+[root@www ~]# gpasswd [-A user1,...] [-M user3,...] groupname
+[root@www ~]# gpasswd [-rR] groupname
+选项与参数：
+    ：若没有任何参数时，表示给予 groupname 一个口令(/etc/gshadow)
+-A  ：将 groupname 的主控权交由后面的使用者管理(该群组的管理员)
+-M  ：将某些账号加入这个群组当中！
+-r  ：将 groupname 的口令移除
+-R  ：让 groupname 的口令栏失效
+
+# 关于群组管理员(Group administrator)做的动作：
+[someone@www ~]$ gpasswd [-ad] user groupname
+选项与参数：
+-a  ：将某位使用者加入到 groupname 这个群组当中！
+-d  ：将某位使用者移除出 groupname 这个群组当中。
+
+范例一：创建一个新群组，名称为 testgroup 且群组交由 vbird1 管理：
+[root@www ~]# groupadd testgroup  <==先创建群组
+[root@www ~]# gpasswd testgroup   <==给这个群组一个口令吧！
+Changing the password for group testgroup
+New Password:
+Re-enter new password:
+# 输入两次口令就对了！
+[root@www ~]# gpasswd -A vbird1 testgroup  <==加入群组管理员为 vbird1
+[root@www ~]# grep testgroup /etc/group /etc/gshadow
+/etc/group:testgroup:x:702:
+/etc/gshadow:testgroup:$1$I5ukIY1.$o5fmW.cOsc8.K.FHAFLWg0:vbird1:
+# 很有趣吧！此时 vbird1 则拥有 testgroup 的主控权喔！身份有点像板主啦！
+
+范例二：以 vbird1 登陆系统，并且让他加入 vbird1, vbird3 成为 testgroup 成员
+[vbird1@www ~]$ id
+uid=504(vbird1) gid=505(vbird1) groups=505(vbird1) ....
+# 看得出来，vbird1 尚未加入 testgroup 群组喔！
+
+[vbird1@www ~]$ gpasswd -a vbird1 testgroup
+[vbird1@www ~]$ gpasswd -a vbird3 testgroup
+[vbird1@www ~]$ grep testgroup /etc/group
+testgroup:x:702:vbird1,vbird3
+```
+
 
