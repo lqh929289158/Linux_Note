@@ -522,4 +522,6 @@ uid=504(vbird1) gid=505(vbird1) groups=505(vbird1) ....
 testgroup:x:702:vbird1,vbird3
 ```
 
+# Linux Account Management and ACL Configuration
 
+ACL: Access Control List. Configure access control for a specified group or user.
