@@ -522,6 +522,103 @@ uid=504(vbird1) gid=505(vbird1) groups=505(vbird1) ....
 testgroup:x:702:vbird1,vbird3
 ```
 
-# Linux Account Management and ACL Configuration
+# 3. Linux Account Management and ACL Configuration
 
 ACL: Access Control List. Configure access control for a specified group or user.
+
+# 4. Switch Account
+
+Why switching account?
+- Use ordinary account.
+- Start a system service with a lower right.
+- Limitations of software.
+
+How to switch?
+- `su -` needs password of **root**.
+- `sudo [cmd]` needs user's own password.(Need to be configured in advance.)
+
+## `su`
+
+```
+[root@www ~]# su [-lm] [-c 命令] [username]
+选项与参数：
+-   ：单纯使用 - 如『 su - 』代表使用 login-shell 的变量文件读取方式来登陆系统；
+      若使用者名称没有加上去，则代表切换为 root 的身份。
+-l  ：与 - 类似，但后面需要加欲切换的使用者账号！也是 login-shell 的方式。
+-m  ：-m 与 -p 是一样的，表示『使用目前的环境配置，而不读取新使用者的配置文件』
+-c  ：仅进行一次命令，所以 -c 后面可以加上命令喔！
+```
+
+### `su` non-login-shell
+```
+范例一：假设你原本是 vbird1 的身份，想要使用 non-login shell 的方式变成 root
+[vbird1@www ~]$ su       <==注意提示字符，是 vbird1 的身份喔！
+Password:                <==这里输入 root 的口令喔！
+[root@www vbird1]# id    <==提示字符的目录是 vbird1 喔！
+uid=0(root) gid=0(root) groups=0(root),1(bin),...   <==确实是 root 的身份！
+[root@www vbird1]# env | grep 'vbird1'
+USER=vbird1
+PATH=/usr/local/bin:/bin:/usr/bin:/home/vbird1/bin  <==这个影响最大！
+MAIL=/var/spool/mail/vbird1                         <==收到的 mailbox 是 vbird1
+PWD=/home/vbird1                                    <==并非 root 的家目录
+LOGNAME=vbird1
+# 虽然你的 UID 已经是具有 root 的身份，但是看到上面的输出信息吗？
+# 还是有一堆变量为原本 vbird1 的身份，所以很多数据还是无法直接利用。
+[root@www vbird1]# exit   <==这样可以离开 su 的环境！
+```
+
+### `su -` login shell
+
+```
+范例二：使用 login shell 的方式切换为 root 的身份并观察变量
+[vbird1@www ~]$ su -
+Password:   <==这里输入 root 的口令喔！
+[root@www ~]# env | grep root
+USER=root
+MAIL=/var/spool/mail/root
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+PWD=/root
+HOME=/root
+LOGNAME=root
+# 了解差异了吧？下次变换成为 root 时，记得最好使用 su - 喔！
+[root@www ~]# exit   <==这样可以离开 su 的环境！
+```
+
+### switch to other account
+
+`su - [username]` or `su -l [username]`. That will ensure that **PATH**, **MAIL**, **USER** etc. environment variables will also switch to new environment.
+
+## `sudo`
+
+### `sudo`
+
+```
+[root@www ~]# sudo [-b] [-u 新使用者账号]
+选项与参数：
+-b  ：将后续的命令放到背景中让系统自行运行，而不与目前的 shell 产生影响
+-u  ：后面可以接欲切换的使用者，若无此项则代表切换身份为 root 。
+
+范例一：你想要以 sshd 的身份在 /tmp 底下创建一个名为 mysshd 的文件
+[root@www ~]# sudo -u sshd touch /tmp/mysshd
+[root@www ~]# ll /tmp/mysshd
+-rw-r--r-- 1 sshd sshd 0 Feb 28 17:42 /tmp/mysshd
+# 特别留意，这个文件的权限是由 sshd 所创建的情况喔！
+
+范例二：你想要以 vbird1 的身份创建 ~vbird1/www 并于其中创建 index.html 文件
+[root@www ~]# sudo -u vbird1 sh -c "mkdir ~vbird1/www; cd ~vbird1/www; \
+>  echo 'This is index.html file' > index.html"
+[root@www ~]# ll -a ~vbird1/www
+drwxr-xr-x 2 vbird1 vbird1 4096 Feb 28 17:51 .
+drwx------ 5 vbird1 vbird1 4096 Feb 28 17:51 ..
+-rw-r--r-- 1 vbird1 vbird1   24 Feb 28 17:51 index.html
+# 要注意，创建者的身份是 vbird1 ，且我们使用 sh -c "一串命令" 来运行的！
+```
+
+For default, only **root** can use **sudo**.
+1. When user execute `sudo`, system will refer `/etc/sudoers`.
+2. If the user has rights for `sudo`, then require its password.
+3. If password OK, then run commands with ID of root or someone else.
+4. If target user ID is the same with current one, no need for password.
+
+### visudo and `/etc/sudoers`
+
