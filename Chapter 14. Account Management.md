@@ -622,3 +622,97 @@ For default, only **root** can use **sudo**.
 
 ### visudo and `/etc/sudoers`
 
+You have to configure `/etc/sudoers` as **root** if you want someone to have the access to `sudo`.
+
+Why **visudo** ? Because `/etc/sudoers` has its own grammar, **visudo** will check grammar after you modify it.
+
+1. An account can execute **all** commands as **root**.
+```
+[username] [host name where you from]=([account that can switch to])  [commands allowed]
+```
+
+```
+[root@www ~]# visudo
+....(前面省略)....
+root    ALL=(ALL)       ALL  <==找到这一行，大约在 76 行左右
+vbird1  ALL=(ALL)       ALL  <==这一行是你要新增的！
+....(前面省略)....
+```
+
+2. Configure group and no-password
+
+```
+[root@www ~]# visudo  <==同样的，请使用 root 先配置
+....(前面省略)....
+%wheel     ALL=(ALL)    ALL <==大约在 84 行左右，请将这行的 # 拿掉！
+# 在最左边加上 % ，代表后面接的是一个『群组』之意！改完请储存后离开
+
+[root@www ~]# usermod -a -G wheel pro1 <==将 pro1 加入 wheel 的支持
+```
+So that everyone in group `wheel` can access `sudo`.
+
+```
+[root@www ~]# visudo  <==同样的，请使用 root 先配置
+....(前面省略)....
+%wheel     ALL=(ALL)   NOPASSWD: ALL <==大约在 87 行左右，请将 # 拿掉！
+# 在最左边加上 % ，代表后面接的是一个『群组』之意！改完请储存后离开
+```
+So that everyone in group `wheel` can access `sudo` without entering their own password.
+
+3. Limited commands
+
+```
+[root@www ~]# visudo  <==注意是 root 身份
+myuser1	ALL=(root)  /usr/bin/passwd  <==最后命令务必用绝对路径
+```
+> NOTE: Must use absolute path!
+> WARNING: The configuration above is problemistic because `myuser1` can modify the password of `root`!
+
+```
+[myuser1@www ~]$ sudo passwd myuser3  <==注意，身份是 myuser1
+Password:  <==输入 myuser1 的口令
+Changing password for user myuser3. <==底下改的是 myuser3 的口令喔！这样是正确的
+New UNIX password:
+Retype new UNIX password:
+passwd: all authentication tokens updated successfully.
+
+[myuser1@www ~]$ sudo passwd
+Changing password for user root.  <==见鬼！怎么会去改 root 的口令？
+```
+
+```
+[root@www ~]# visudo  <==注意是 root 身份
+myuser1	ALL=(root)  !/usr/bin/passwd, /usr/bin/passwd [A-Za-z]*, \
+                    !/usr/bin/passwd root
+```
+
+- Ban `sudo passwd`.
+- Ban `sudo passwd root`.
+- Allow the others.
+
+4. Configure **visudo** as alias
+
+- `User_Alias`
+- `Cmnd_Alias`
+
+```
+[root@www ~]# visudo  <==注意是 root 身份
+User_Alias ADMPW = pro1, pro2, pro3, myuser1, myuser2
+Cmnd_Alias ADMPWCOM = !/usr/bin/passwd, /usr/bin/passwd [A-Za-z]*, \
+                      !/usr/bin/passwd root
+ADMPW   ALL=(root)  ADMPWCOM
+```
+5. Interval
+
+Probably, you have to enter your password again after 5 minutes withou action.
+
+6. `sudo`+`su`
+
+```
+[root@www ~]# visudo
+User_Alias  ADMINS = pro1, pro2, pro3, myuser1
+ADMINS ALL=(root)  /bin/su -
+```
+So that, the users can switch to root by `sudo su -` with their own passwords. Thus, the password of **root** will be secret.
+
+> NOTE: The users who can switch to **root** should be the ones you can believe in. 
