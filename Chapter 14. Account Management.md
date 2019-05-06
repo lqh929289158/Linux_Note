@@ -716,3 +716,27 @@ ADMINS ALL=(root)  /bin/su -
 So that, the users can switch to root by `sudo su -` with their own passwords. Thus, the password of **root** will be secret.
 
 > NOTE: The users who can switch to **root** should be the ones you can believe in. 
+
+# 5. Special Shell and PAM module.
+
+## Special Shell `/sbin/nologin`
+
+The accounts(including system accounts) configured to `/sbin/nologin` shell have no access to **bash** or other shells. But they can access parts of the resources.
+
+For example, the Linux host providing mail service, almost all accounts on the host, just receive and send mails.
+
+### `/etc/nologin.txt`
+
+The information shown when we can not log in to an account.
+
+```
+[root@www ~]# su - myuser3
+This account is system account or mail account.
+Please DO NOT use this account to login my Linux server.
+```
+
+## PAM(Pluggable Authentication Modules) Module
+
+The module you can call to authentication whatever program you are using.
+
+### Configuration Grammar
