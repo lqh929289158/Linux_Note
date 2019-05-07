@@ -739,4 +739,31 @@ Please DO NOT use this account to login my Linux server.
 
 The module you can call to authentication whatever program you are using.
 
+The procedure after you execute `passwd` which calls PAM:
+1. User runs `/user/bin/passwd` and enter password.
+2. `passwd` call PAM for authentication.
+3. PAM search a configuration file called `passwd` in path `/etc/pam.d/`.
+4. According to configuration, import related PAM module and analyize.
+5. Return authentication results to `passwd`.
+6. `passwd` acts depending on the return values.
+
 ### Configuration Grammar
+
+```
+[root@www ~]# cat /etc/pam.d/passwd
+#%PAM-1.0  <==PAM版本的说明而已！
+auth       include      system-auth <==每一行都是一个验证的过程
+account    include      system-auth
+password   include      system-auth
+验证类别   控制标准     PAM 模块与该模块的参数
+```
+- Type(Typically in sequence):
+  - **auth**: authenticate the identification of user.
+  - **account**: Authorization. Wheter have rights for something.
+  - **session**: ...
+  - **passowrd**: Modification of password.
+- Control Flag:
+  - **required**: return success value if authentication succeed, and vice versa.
+  - **requisite**: return failure value immediately if authentication fails, and skip the authentication followed.
+  - **sufficient**: return success value immediately if authentication succeed, and skip the authentication followed.
+  - **optional**: Just for showing info, not for authentication.
