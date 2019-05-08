@@ -767,3 +767,54 @@ password   include      system-auth
   - **requisite**: return failure value immediately if authentication fails, and skip the authentication followed.
   - **sufficient**: return success value immediately if authentication succeed, and skip the authentication followed.
   - **optional**: Just for showing info, not for authentication.
+  - **inlcude**: refer to the module file(the 3rd parameter).
+- Usually-used module:
+```
+[root@www ~]# cat /etc/pam.d/login
+#%PAM-1.0
+auth [user_unknown=ignore success=ok ignore=ignore default=bad] pam_securetty.so
+auth       include      system-auth
+account    required     pam_nologin.so
+account    include      system-auth
+password   include      system-auth
+# pam_selinux.so close should be the first session rule
+session    required     pam_selinux.so close
+session    include      system-auth
+session    required     pam_loginuid.so
+session    optional     pam_console.so
+# pam_selinux.so open should only be followed by sessions...
+session    required     pam_selinux.so open
+session    optional     pam_keyinit.so force revoke
+# 我们可以看到，其实 login 也呼叫多次的 system-auth ，所以底下列出该配置文件
+
+[root@www ~]# cat /etc/pam.d/system-auth
+#%PAM-1.0
+# This file is auto-generated.
+# User changes will be destroyed the next time authconfig is run.
+auth     required     pam_env.so
+auth     sufficient   pam_unix.so nullok try_first_pass
+auth     requisite    pam_succeed_if.so uid >= 500 quiet
+auth     required     pam_deny.so
+
+account  required     pam_unix.so
+account  sufficient   pam_succeed_if.so uid < 500 quiet
+account  required     pam_permit.so
+
+password requisite    pam_cracklib.so try_first_pass retry=3
+password sufficient   pam_unix.so md5 shadow nullok try_first_pass use_authtok
+password required     pam_deny.so
+
+session  optional     pam_keyinit.so revoke
+session  required     pam_limits.so
+session  [success=1 default=ignore] pam_succeed_if.so service in crond quiet \
+                      use_uid
+session  required     pam_unix.so
+```
+  - `/etc/pam.d/*`: PAM configuration for each program.
+  - `/lib/security/*`: The path where PAM configuration files are stored.
+  - `/etc/security/*`: Other PAM configuration files.
+  - `/usr/share/doc/pam-*/`: Detailed PAM info file.
+
+- `pam_securetty.so`: Limit root to login only from secure terminal.
+- `pam_nologin.so`: Limit ordinary user not to login host.
+- `pam_selinux.so`: 
