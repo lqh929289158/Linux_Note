@@ -818,3 +818,73 @@ session  required     pam_unix.so
 - `pam_securetty.so`: Limit root to login only from secure terminal.
 - `pam_nologin.so`: Limit ordinary user not to login host.
 - `pam_selinux.so`: 
+- `pam_console.so`:
+- `pam_loginuid.so`:
+- `pam_env.so`: Module for configure environment variables
+- `pam_unix.so`: Complex but frequently used.
+- `pam_cracklib.so`: Check the security level of password. Including the max number of try, password in dictionary or not.
+- `pam_limits.so`: 
+
+The procedure of login.
+1. Authentication: 
+  - According to `pam_securetty.so`, if user is root, refer to `/etc/securetty`.
+  - Configure extra environment variables by `pam_env.so`. 
+  - Check password by `pam_unix.so`. If OK, return to 'login' program, else
+  - Check UID by `pam_succeed_if.so`. If UID < 500,  return failure, else
+  - Reject connection by `pam_deny.so`.
+2. Account:
+  - Judge `/etc/nologin` exist or not by `pam_nologin.so`. If exists, reject login of ordinary users.
+  - Manage account by `pam_unix`.
+  - Check UID by `pam_succeed_if.so`. If UID < 500, not log info.
+  - Permit login by `pam_permit.so`
+3. Password:
+  - Configure max try to 3 by `pam_cracklib.so`.
+  - Use **md5**,**shadow** etc. functions to check password by `pam_unix.so`. If OK, return value to login, else
+  - Reject login by `pam_deny.so`.
+4. Session:
+  - Turn off **SELinux** temporarily by `pam_selinux.so`.
+  - Configure system resources available for the user by `pam_limits.so`
+  - Log related info into login files.
+  - Configure access control according to UID by `pam_loginuid.so`.
+  - Turn on **SELinux**.
+> NOTE: WHY can't login system as root by `telnet` but OK by `ssh`? `telnet` uses dynamic terminal `pts/n` which is not written into `/etc/securetyy`.But `telnet` login is limited by `/etc/securetty`. So **root** can not login remote sysytem by `telnet`. `ssh` uses the module `/etc/pam.d/sshd` which is not written to `/etc/securetty` too. But `ssh` login is not limited by `/etc/securetyy`!
+
+### `limits.conf`
+
+```
+范例一：vbird1 这个用户只能创建 100MB 的文件，且大于 90MB 会警告
+[root@www ~]# vi /etc/security/limits.conf
+vbird1	soft		fsize		 90000
+vbird1	hard		fsize		100000
+#账号   限制依据	限制项目 	限制值
+# 第一字段为账号，或者是群组！若为群组则前面需要加上 @ ，例如 @projecta
+# 第二字段为限制的依据，是严格(hard)，还是仅为警告(soft)；
+# 第三字段为相关限制，此例中限制文件容量，
+# 第四字段为限制的值，在此例中单位为 KB。
+# 若以 vbird1 登陆后，进行如下的操作则会有相关的限制出现！
+
+[vbird1@www ~]$ ulimit -a
+....(前面省略)....
+file size               (blocks, -f) 90000
+....(后面省略)....
+
+[vbird1@www ~]$ dd if=/dev/zero of=test bs=1M count=110
+File size limit exceeded
+[vbird1@www ~]$ ll -k test
+-rw-rw-r-- 1 vbird1 vbird1 90000 Mar  4 11:30 test
+# 果然有限制到了
+
+范例二：限制 pro1 这个群组，每次仅能有一个用户登陆系统 (maxlogins)
+[root@www ~]# vi /etc/security/limits.conf
+@pro1   hard   maxlogins   1
+# 如果要使用群组功能的话，这个功能似乎对初始群组才有效喔！
+# 而如果你尝试多个 pro1 的登陆时，第二个以后就无法登陆了。
+# 而且在 /var/log/secure 文件中还会出现如下的信息：
+# pam_limits(login:session): Too many logins (max 1) for pro1
+```
+The file is called dynamically, so you do not have to restart any service after modifying it.
+
+### `/var/log/secure` and `/var/log/messages`
+
+Login failure and unexpected errors will be logged in these files.
+
