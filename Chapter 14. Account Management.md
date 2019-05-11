@@ -888,3 +888,11 @@ The file is called dynamically, so you do not have to restart any service after 
 
 Login failure and unexpected errors will be logged in these files.
 
+# 6. Message between users.
+
+## `w`,`who`,`last`,`lastlog` inquire users
+
+Review `id` and `finger` to list infos about a user.
+
+- `w`: list all login users.
+- `who`:
