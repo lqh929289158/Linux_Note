@@ -895,4 +895,40 @@ Login failure and unexpected errors will be logged in these files.
 Review `id` and `finger` to list infos about a user.
 
 - `w`: list all login users.
-- `who`:
+- `who`: list all login users only with TTY and login time.
+- `lastlog`: list all account recently logged in and login time.
+
+## Talk between users `write`,`mesg`,`wall`
+
+### `write`
+
+```
+[root@www ~]# write 使用者账号 [用户所在终端接口]
+
+[root@www ~]# who
+root     pts/1    2009-03-04 11:04 (192.168.1.100)
+vbird1   pts/2    2009-03-04 13:15 (192.168.1.100)  <==有看到 vbird1 在在线
+
+[root@www ~]# write vbird1 pts/2
+Hello, there:
+Please don't do anything wrong...  <==这两行是 root 写的信息！
+# 结束时，请按下 [crtl]-d 来结束输入。此时在 vbird1 的画面中，会出现：
+
+Message from root@www.vbird.tsai on pts/1 at 13:23 ...
+Hello, there:
+Please don't do anything wrong...
+EOF
+```
+
+- User can refuse message by `mesg n`.
+- User can check the state of itself by `mesg`.
+- But user can not 
+
+
+
+
+
+
+
+
+
