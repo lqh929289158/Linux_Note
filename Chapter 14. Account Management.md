@@ -922,8 +922,48 @@ EOF
 
 - User can refuse message by `mesg n`.
 - User can check the state of itself by `mesg`.
-- But user can not 
+- But user can not refuse message from **root**.
+- **root** can refuse message from anyone.
+- Use `mesg y` to allow message.
 
+### `wall` to broadcast message.
+```
+[root@www ~]# wall "I will shutdown my linux server..."
+```
+
+## Mailbox `mail` to send message offline.
+Problem: `wall`,`write` only used for **online** users!
+
+So, use `mail` to send message to offline users.
+
+Usage: `mail username@host -s "[Title]"`
+
+```
+[root@www ~]# mail vbird1 -s "nice to meet you"
+Hello, D.M. Tsai
+Nice to meet you in the network.
+You are so nice.  byebye!
+.    <==这里很重要喔，结束时，最后一行输入小数点 . 即可！
+Cc:  <==这里是所谓的『副本』，不需要寄给其他人，所以直接 [Enter]
+[root@www ~]#  <==出现提示字符，表示输入完毕了！
+```
+
+- When `host` is `localhost`, it can be omitted.
+- If you want to deliver a message from a file. Use redirection `<`.
+```
+mail username@host -s "[Title]" < [File name]
+```
+
+How to read mail from mailbox?
+
+The meaning of commands after entering `mail`:
+- `h [n]`: list first `[n]` titles.
+- `d[n1-n2]`: delete `[n1]` to `[n2]` mails in mailbox.
+- `s [n] [path]`: save the `[n]`th mail as a file in `[path]`.
+- `x` or `exit`: leave mailbox without saving.
+- `q`: 1. Remove the mails deleted just now. 2. Move the read mails to `~/mbox` and remove them from mailbox. 3.Leave
+
+> NOTE: `/var/spool/mail/username` is the mailbox to store new messages. `/home/[username]/mbox` is the mail box to store having been read messages. Use `mail -f /home/[username]/mbox` to check mails.
 
 
 
