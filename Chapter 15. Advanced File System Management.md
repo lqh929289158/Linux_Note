@@ -73,3 +73,5 @@ What is the demerit?
 ## 2.5 Turn on auto-RAID and auto mount
 
 ## 2.6 Turn off RAID
+
+# 3. Logical Volume Manger(LVM)
