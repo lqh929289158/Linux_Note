@@ -63,3 +63,13 @@ What is the demerit?
 - Data safety and reliability
 - Read/Writing efficiency.
 - Volume
+
+## 2.2 Software/Hardware RAID
+
+## 2.3 Software RAID configuration 
+
+## 2.4 RAID Rescue
+
+## 2.5 Turn on auto-RAID and auto mount
+
+## 2.6 Turn off RAID
