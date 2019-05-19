@@ -14,7 +14,7 @@
 - Track/Update database of **RPM**: 
 - Remove cached files: `tmpwatch`
 - Analyze network service: 
-# 2. Routine Process only once
+# 2. Routine Process only once(`at`)
 
 ## 2.1 Start **atd** and `at`
 
@@ -132,7 +132,47 @@ job 6 at 2009-03-17 23:00
 [root@www ~]# atrm 6
 ```
 
+# 3. Routine Process loop(`crontab`)
 
-# 3. Routine Process loop
+## 3.1 Configuration of users and usage
+
+Similar to `at`. 
+- 1. If `/etc/cron.allow` exists, only users listed in the file can use `crontab`.
+- 2. Else if `/etc/cron.deny` exists, the users not listed in the file can use `crontab`.
+- 3. Else only **root** can use it.
+
+- The tasks created will be put to `/var/spool/cron/[username]/`.
+- All jobs executed by `cron` will be logged into `/var/log/cron`.(Check whether there are virus or troyean?)
+
+```
+[root@www ~]# crontab [-u username] [-l|-e|-r]
+选项与参数：
+-u  ：只有 root 才能进行这个任务，亦即帮其他使用者创建/移除 crontab 工作排程；
+-e  ：编辑 crontab 的工作内容
+-l  ：查阅 crontab 的工作内容
+-r  ：移除所有的 crontab 的工作内容，若仅要移除一项，请用 -e 去编辑。
+
+范例一：用 dmtsai 的身份在每天的 12:00 发信给自己
+[dmtsai@www ~]$ crontab -e
+# 此时会进入 vi 的编辑画面让您编辑工作！注意到，每项工作都是一行。
+0   12  *  *  * mail dmtsai -s "at 12:00" < /home/dmtsai/.bashrc
+#分 时 日 月 周 |<==============命令串========================>|
+```
+- minute: 0~59
+- hour: 0~23
+- date: 1~31
+- month: 1-12
+- week: 0-7 (both 0 and 7 are **Sunday**)
+- command
+
+- Special Symbol:
+ - `*`: Any
+ - `,`:  And `0 3,6 * * * cmd` 3:00 and 6:00.
+ - `-`: Range `0 3-6 * * * cmd` from 3:00 to 6:00.
+ - `/n`: per `*/5 * * * * cmd` per 5 minutes execute once.(Or `0-59/5 * * * * cmd`)
+## 3.2 Configuration File `/etc/crontab`
+
+
+
 
 # 4. Routine Process during power off
