@@ -172,7 +172,28 @@ Similar to `at`.
  - `/n`: per `*/5 * * * * cmd` per 5 minutes execute once.(Or `0-59/5 * * * * cmd`)
 ## 3.2 Configuration File `/etc/crontab`
 
+The command `crontab -e` is designed for **users' cron**.
+You can edit `/etc/crontab` to manage **system routine**. It is just a **text** file! It will work in 1 minutes after edition.
 
+```
+[root@www ~]# cat /etc/crontab
+SHELL=/bin/bash                     <==使用哪种 shell 介面
+PATH=/sbin:/bin:/usr/sbin:/usr/bin  <==运行档搜寻路径
+MAILTO=root                         <==若有额外STDOUT，以 email将数据送给谁
+HOME=/                              <==默认此 shell 的家目录所在
 
+# run-parts
+01  *  *  *  *   root      run-parts /etc/cron.hourly   <==每小时
+02  4  *  *  *   root      run-parts /etc/cron.daily    <==每天
+22  4  *  *  0   root      run-parts /etc/cron.weekly   <==每周日
+42  4  1  *  *   root      run-parts /etc/cron.monthly  <==每个月 1 号
+分 时 日 月 周 运行者身份  命令串
+```
 
+- `MAILTO=root`: The error information of **cron** will be sent to which mailbox.
+- `PATH`: The execution path.
+- The fifth column: Identification to run the routine. Default: **root**.
+- (**IMPORTANT**)`run-parts /etc/cron.hourly/`: Run all scripts in path `/etc/cron.hourly` every hour.
+
+## 3.3 NOTES
 # 4. Routine Process during power off
