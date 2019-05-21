@@ -216,3 +216,70 @@ Whether there are unexpected commands in `/var/log/cron`?
 ### week can't be together with (date and month)
 
 # 4. Routine Process during power off
+
+## 4.1 What is `anacron`
+
+`anacron` will find all commands(**cron**) that should have been executed during power off. And then execute them all once and stop service.
+
+- `anacron`(**_timestamp_**) will be updated with a period of one day, one week or one month.
+- `anacron` will compare the **_timestamp_** of itself, and if timestamps are different, it will try to find all unexecuted commands in the period(previous timestamp ~ current timestamp).
+
+## 4.2 `anacron` and `/etc/anacrontab`
+
+`anacron` is a **PROGRAM**, **NOT a SERVICE**! It's just a **cron** written in `/etc/cron.daily/0anacron`.
+`/etc/cron.daily/0anacron` **ONLY** updates timestamp.
+```
+[root@www ~]# anacron [-sfn] [job]..
+[root@www ~]# anacron -u [job]..
+选项与参数：
+-s  ：开始一连续的运行各项工作 (job)，会依据时间记录档的数据判断是否进行；
+-f  ：强制进行，而不去判断时间记录档的时间戳记；
+-n  ：立刻进行未进行的任务，而不延迟 (delay) 等待时间；
+-u  ：仅升级时间记录档的时间戳记，不进行任何工作。
+job ：由 /etc/anacrontab 定义的各项工作名称。
+```
+What is in `/etc/anacrontab`?
+```
+[root@www ~]# cat /etc/anacrontab
+SHELL=/bin/sh
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+1       65      cron.daily     run-parts /etc/cron.daily
+7       70      cron.weekly    run-parts /etc/cron.weekly
+30      75      cron.monthly   run-parts /etc/cron.monthly
+天数   延迟时间 工作名称定义   实际要进行的命令串
+# 天数单位为天；延迟时间单位为分钟；工作名称定义可自订；
+# 命令串则通常与 crontab 的配置相同！
+
+[root@www ~]# more /var/spool/anacron/*
+::::::::::::::
+/var/spool/anacron/cron.daily
+::::::::::::::
+20090315
+::::::::::::::
+/var/spool/anacron/cron.monthly
+::::::::::::::
+20090301
+::::::::::::::
+/var/spool/anacron/cron.weekly
+::::::::::::::
+20090315
+# 上面则是三个工作名称的时间记录档以及记录的时间戳记
+```
+
+If you run `anacron -s cron.daily`:
+1. `/etc/anacrontab` find that the period of `cron.daily` is one day.
+2. Extract **timestamp** from `/var/spool/anacron/cron.daily`, which means the last time when `anacron` was executed.
+3. Compare the timestamp with the time now. If difference is more that one day, ready to execute commands.
+4. If ready to execute commands, delay some time(65 minutes) according to configuration in `/etc/anacrontab`
+5. After delay time, run `run-parts /etc/cron.daily` to execute all daily jobs.
+6. End and exit.
+
+## 4.3 Check whether anacron is activated.
+```
+[root@www ~]# chkconfig --list anacron
+anacron      0:off   1:off   2:on    3:on    4:on    5:on    6:off
+# 详细的 chkconfig 说明我们会在后续章节提到，注意看 3, 5
+# 的项目，都是 on ！那就是有启动啦！启动时才会运行的意思！
+```
