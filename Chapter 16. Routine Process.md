@@ -196,4 +196,23 @@ HOME=/                              <==默认此 shell 的家目录所在
 - (**IMPORTANT**)`run-parts /etc/cron.hourly/`: Run all scripts in path `/etc/cron.hourly` every hour.
 
 ## 3.3 NOTES
+### Balance of resource allocation
+
+If all **cron** start from the same time and repeat every five minutes, the load of CPU will be heavy for every five minutes. So, we can do this:
+```
+[root@www ~]# vi /etc/crontab
+1,6,11,16,21,26,31,36,41,46,51,56 * * * * root  CMD1
+2,7,12,17,22,27,32,37,42,47,52,57 * * * * root  CMD2
+3,8,13,18,23,28,33,38,43,48,53,58 * * * * root  CMD3
+4,9,14,19,24,29,34,39,44,49,54,59 * * * * root  CMD4
+```
+Let the routines start from different times.
+### Cancel unnecessary output
+Redirect the output to `/dev/null` by ` > /dev/null`
+
+### Check security
+Whether there are unexpected commands in `/var/log/cron`?
+
+### week can't be together with (date and month)
+
 # 4. Routine Process during power off
