@@ -57,6 +57,83 @@ In summary:
 
 ## 2.2 Job Control management
 
+### Execute command in background `&`
+
+```
+[root@www ~]# tar -zpcf /tmp/etc.tar.gz /etc &
+[1] 8400  <== [job number] PID 
+[root@www ~]# tar: Removing leading `/' from member names 
+# 在中括号内的号码为工作号码 (job number)，该号码与 bash 的控制有关。
+# 后续的 8400 则是这个工作在系统中的 PID。至於后续出现的数据是 tar 运行的数据流，
+# 由於我们没有加上数据流重导向，所以会影响画面！不过不会影响前景的操作喔！
+```
+The output(**stdout**, **stderr**) will still be printed on the foreground. But the task can not be killed by \[Ctrl\]+c.
+The best way is to redirect the output.
+```
+[root@www ~]# tar -zpcvf /tmp/etc.tar.gz /etc > /tmp/log.txt 2>&1 &
+[1] 8429
+[root@www ~]# 
+```
+All output will be redirected to the file `/tmp/log.txt`.
+
+### Stop the job temporarily and throw into background \[Ctrl\]+z
+
+### Check background `jobs`
+
+```
+[root@www ~]# jobs [-lrs]
+选项与参数：
+-l  ：除了列出 job number 与命令串之外，同时列出 PID 的号码；
+-r  ：仅列出正在背景 run 的工作；
+-s  ：仅列出正在背景当中暂停 (stop) 的工作。
+
+范例一：观察目前的 bash 当中，所有的工作，与对应的 PID
+[root@www ~]# jobs -l
+[1]- 10314 Stopped                 vim ~/.bashrc
+[2]+ 10833 Stopped                 find / -print
+```
+The symbol `+` means the last job pushed into background.`-` is the last second job pushed into background. The others have no symbol. 
+
+### Get the job back from background to foreground `fg`
+```
+[root@www ~]# fg %jobnumber
+选项与参数：
+%jobnumber ：jobnumber 为工作号码(数字)。注意，那个 % 是可有可无的！
+
+范例一：先以 jobs 观察工作，再将工作取出：
+[root@www ~]# jobs
+[1]- 10314 Stopped                 vim ~/.bashrc
+[2]+ 10833 Stopped                 find / -print
+[root@www ~]# fg      <==默认取出那个 + 的工作，亦即 [2]。立即按下[ctrl]-z
+[root@www ~]# fg %1   <==直接规定取出的那个工作号码！再按下[ctrl]-z
+[root@www ~]# jobs
+[1]+  Stopped                 vim ~/.bashrc
+[2]-  Stopped                 find / -print
+```
+In default, `fg` will get the `+` job from background to foreground, unless you specify the PID.
+
+### Continue the stopped job in background `bg`
+```
+范例一：一运行 find / -perm +7000 > /tmp/text.txt 后，立刻丢到背景去暂停！
+[root@www ~]# find / -perm +7000 > /tmp/text.txt
+# 此时，请立刻按下 [ctrl]-z 暂停！
+[3]+  Stopped                 find / -perm +7000 > /tmp/text.txt
+
+范例二：让该工作在背景下进行，并且观察他！！
+[root@www ~]# jobs ; bg %3 ; jobs
+[1]-  Stopped                 vim ~/.bashrc
+[2]   Stopped                 find / -print
+[3]+  Stopped                 find / -perm +7000 > /tmp/text.txt
+[3]+ find / -perm +7000 > /tmp/text.txt &  <==用 bg%3 的情况！
+[1]+  Stopped                 vim ~/.bashrc
+[2]   Stopped                 find / -print
+[3]-  Running                 find / -perm +7000 > /tmp/text.txt &
+```
+
+
+
+
+
 # 3. Process Management
 
 # 4. Special file and process
