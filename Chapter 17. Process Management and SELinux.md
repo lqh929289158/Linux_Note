@@ -130,11 +130,115 @@ In default, `fg` will get the `+` job from background to foreground, unless you 
 [3]-  Running                 find / -perm +7000 > /tmp/text.txt &
 ```
 
+### `kill`
 
+```
+[root@www ~]# kill -signal %jobnumber
+[root@www ~]# kill -l
+选项与参数：
+-l  ：这个是 L 的小写，列出目前 kill 能够使用的讯号 (signal) 有哪些？
+signal ：代表给予后面接的那个工作什么样的指示罗！用 man 7 signal 可知：
+  -1 ：重新读取一次参数的配置档 (类似 reload)；
+  -2 ：代表与由键盘输入 [ctrl]-c 同样的动作；
+  -9 ：立刻强制删除一个工作；
+  -15：以正常的程序方式终止一项工作。与 -9 是不一样的。
 
+范例一：找出目前的 bash 环境下的背景工作，并将该工作『强制删除』。
+[root@www ~]# jobs
+[1]+  Stopped                 vim ~/.bashrc
+[2]   Stopped                 find / -print
+[root@www ~]# kill -9 %2; jobs
+[1]+  Stopped                 vim ~/.bashrc
+[2]   Killed                  find / -print
+# 再过几秒你再下达 jobs 一次，就会发现 2 号工作不见了！因为被移除了！
+
+范例：找出目前的 bash 环境下的背景工作，并将该工作『正常终止』掉。
+[root@www ~]# jobs
+[1]+  Stopped                 vim ~/.bashrc
+[root@www ~]# kill -SIGTERM %1
+# -SIGTERM 与 -15 是一样的！您可以使用 kill -l 来查阅！
+```
+
+- `-9` is used to terminate an abnormal job.
+- `-15` is used to terminate a job normally.
+
+## 2.3 Offline Management
+
+Problem: Suppose that you log in a host remotely, the jobs will be killed when you log out even if they are in background.
+
+Why? Note that you log in with a terminal like `tty1`, `bg`,`&`,`fg` are just management about your **terminal**, not system background or foreground.
+
+You can use `at` to put the jobs into system background despite of terminal. Or use `nohup`:
+
+```
+[root@www ~]# nohup [命令与参数]   <==在终端机前景中工作
+[root@www ~]# nohup [命令与参数] & <==在终端机背景中工作
+
+# 1. 先编辑一支会『睡著 500 秒』的程序：
+[root@www ~]# vim sleep500.sh
+#!/bin/bash
+/bin/sleep 500s
+/bin/echo "I have slept 500 seconds."
+
+# 2. 丢到背景中去运行，并且立刻注销系统：
+[root@www ~]# chmod a+x sleep500.sh
+[root@www ~]# nohup ./sleep500.sh &
+[1] 5074
+[root@www ~]# nohup: appending output to ‘nohup.out’ <==会告知这个信息！
+[root@www ~]# exit
+```
+> WARNING: `nohup` does **NOT** support built-in bash commands. So you have to use external commands(Specify the absolute path of commands).
 
 
 # 3. Process Management
+
+Motivations of process management:
+- The execution rights are related to the PID of the process.
+- How to find the allocation distribution of resources among the processes.
+- How to find a problematic process in the memory.
+- How to set priority of process
+
+## 3.1 Observation
+
+### `ps` print the processes now once.
+```
+[root@www ~]# ps aux  <==观察系统所有的程序数据
+[root@www ~]# ps -lA  <==也是能够观察所有系统的数据
+[root@www ~]# ps axjf <==连同部分程序树状态
+选项与参数：
+-A  ：所有的 process 均显示出来，与 -e 具有同样的效用；
+-a  ：不与 terminal 有关的所有 process ；
+-u  ：有效使用者 (effective user) 相关的 process ；
+x   ：通常与 a 这个参数一起使用，可列出较完整资讯。
+输出格式规划：
+l   ：较长、较详细的将该 PID 的的资讯列出；
+j   ：工作的格式 (jobs format)
+-f  ：做一个更为完整的输出。
+```
+### (Usually used) Only process of my bash: `ps -l`
+```
+范例一：将目前属於您自己这次登陆的 PID 与相关资讯列示出来(只与自己的 bash 有关)
+[root@www ~]# ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+4 S     0 13639 13637  0  75   0 -  1287 wait   pts/1    00:00:00 bash
+4 R     0 13700 13639  0  77   0 -  1101 -      pts/1    00:00:00 ps
+```
+- F: process flags(rights)
+  - 4: root
+  - 1: sub-process forked but not executed
+- S: state
+  - R: Running
+  - S: Sleep can be awaked by signal
+  - D: Sleep can't be awaked by signal (may be waiting for I/O)
+  - T: Stopped. (Maybe stopped into background or traced)
+  - Z: Zombie. Terminated but not removed from memory.
+- UID/PID/PPID: User ID/Process ID/Parent Process ID.
+- C: CPU occupation rate.
+- PRI/NI: Priority/Nice. Smaller ones prior.
+- ADDR/SZ/WCHAN: kernel function, the address of program in memory.(`-` for running)/Used Memory/Running or not (`-` for running)
+- TTY: termial address. Dynamic terminal `pts/n` for remote login.
+- TIME: Consumed CPU time. (The total CPU execution time, not the time how long the process in system!)
+- CMD: command which trigger the process.
 
 # 4. Special file and process
 
