@@ -239,7 +239,35 @@ F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
 - TTY: termial address. Dynamic terminal `pts/n` for remote login.
 - TIME: Consumed CPU time. (The total CPU execution time, not the time how long the process in system!)
 - CMD: command which trigger the process.
+### Observe all system process: `ps aux`
 
+```
+范例二：列出目前所有的正在内存当中的程序：
+[root@www ~]# ps aux
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0   2064   616 ?        Ss   Mar11   0:01 init [5]
+root         2  0.0  0.0      0     0 ?        S<   Mar11   0:00 [migration/0]
+root         3  0.0  0.0      0     0 ?        SN   Mar11   0:00 [ksoftirqd/0]
+.....(中间省略).....
+root     13639  0.0  0.2   5148  1508 pts/1    Ss   11:44   0:00 -bash
+root     14232  0.0  0.1   4452   876 pts/1    R+   15:52   0:00 ps aux
+root     18593  0.0  0.0   2240   476 ?        Ss   Mar14   0:00 /usr/sbin/atd
+```
+- USER: Owner
+- PID
+- %CPU: Occupied CPU
+- %MEM: Occupied Real Memory
+- VSZ: Occupied Virtual Memory(KB)
+- RSS: Occupied fixed Memory(KB)
+- TTY: Run on which termial (`?` for no relation with terminal)
+  - `tty1-tty6`
+  - `pts/0`... login by network
+- STAT: state(flag)
+- START: Start time.
+- TIME: CPU execution in real.
+- COMMAND
+
+Zombie process: The process should be terminated but the parent process can not allow it terminated for some reason. So the process will be left in the memory but will not be moved out unless `kill`. The label is `<defunct>`.
 # 4. Special file and process
 
 # 5. SELinux
