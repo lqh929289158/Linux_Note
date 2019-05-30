@@ -268,6 +268,54 @@ root     18593  0.0  0.0   2240   476 ?        Ss   Mar14   0:00 /usr/sbin/atd
 - COMMAND
 
 Zombie process: The process should be terminated but the parent process can not allow it terminated for some reason. So the process will be left in the memory but will not be moved out unless `kill`. The label is `<defunct>`.
+
+### `top` dynamic process observation
+
+```
+[root@www ~]# top [-d 数字] | top [-bnp]
+选项与参数：
+-d  ：后面可以接秒数，就是整个程序画面升级的秒数。默认是 5 秒；
+-b  ：以批量的方式运行 top ，还有更多的参数可以使用喔！
+      通常会搭配数据流重导向来将批量的结果输出成为文件。
+-n  ：与 -b 搭配，意义是，需要进行几次 top 的输出结果。
+-p  ：指定某些个 PID 来进行观察监测而已。
+在 top 运行过程当中可以使用的按键命令：
+	? ：显示在 top 当中可以输入的按键命令；
+	P ：以 CPU 的使用资源排序显示；
+	M ：以 Memory 的使用资源排序显示；
+	N ：以 PID 来排序喔！
+	T ：由该 Process 使用的 CPU 时间累积 (TIME+) 排序。
+	k ：给予某个 PID 一个讯号  (signal)
+	r ：给予某个 PID 重新制订一个 nice 值。
+	q ：离开 top 软件的按键。
+```
+```
+范例一：每两秒钟升级一次 top ，观察整体资讯：
+[root@www ~]# top -d 2
+top - 17:03:09 up 7 days, 16:16,  1 user,  load average: 0.00, 0.00, 0.00
+Tasks:  80 total,   1 running,  79 sleeping,   0 stopped,   0 zombie
+Cpu(s):  0.5%us,  0.5%sy,  0.0%ni, 99.0%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st
+Mem:    742664k total,   681672k used,    60992k free,   125336k buffers
+Swap:  1020088k total,       28k used,  1020060k free,   311156k cached
+    <==如果加入 k 或 r 时，就会有相关的字样出现在这里喔！
+  PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND     
+14398 root      15   0  2188 1012  816 R  0.5  0.1   0:00.05 top
+    1 root      15   0  2064  616  528 S  0.0  0.1   0:01.38 init
+    2 root      RT  -5     0    0    0 S  0.0  0.0   0:00.00 migration/0
+    3 root      34  19     0    0    0 S  0.0  0.0   0:00.00 ksoftirqd/0
+```
+- Line 1: top,current time, execution time, login users, average load
+- Line 2: Tasks, total, running, sleeping, stopped, zombie
+- Line 3: Cpus
+- Line 4: Physical Memory
+- Line 5: Virtual Memory(Swap)
+- States of Processes:
+  - PID,USER
+  - PR(Priority), NI(Nice)
+  - %CPU, %MEM
+  - TIME+: Total CPU time.
+> NOTE: Usually used command: Press `P` in top to sort by CPU forcely.
+
 # 4. Special file and process
 
 # 5. SELinux
