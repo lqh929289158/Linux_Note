@@ -316,6 +316,56 @@ Swap:  1020088k total,       28k used,  1020060k free,   311156k cached
   - TIME+: Total CPU time.
 > NOTE: Usually used command: Press `P` in top to sort by CPU forcely.
 
+### `pstree`
+```
+[root@www ~]# pstree [-A|U] [-up]
+选项与参数：
+-A  ：各程序树之间的连接以 ASCII 字节来连接；
+-U  ：各程序树之间的连接以万国码的字节来连接。在某些终端介面下可能会有错误；
+-p  ：并同时列出每个 process 的 PID；
+-u  ：并同时列出每个 process 的所属帐号名称。
+
+范例一：列出目前系统上面所有的程序树的相关性：
+[root@www ~]# pstree -A
+init-+-acpid
+     |-atd
+     |-auditd-+-audispd---{audispd}  <==这行与底下一行为 auditd 分出来的子程序
+     |        `-{auditd}
+     |-automount---4*[{automount}]   <==默认情况下，相似的程序会以数字显示
+....(中间省略)....
+     |-sshd---sshd---bash---pstree   <==就是我们命令运行的那个相依性！
+....(底下省略)....
+# 注意一下，为了节省版面，所以鸟哥已经删去很多程序了！
+
+范例二：承上题，同时秀出 PID 与 users 
+[root@www ~]# pstree -Aup
+init(1)-+-acpid(4555)
+        |-atd(18593)
+        |-auditd(4256)-+-audispd(4258)---{audispd}(4261)
+        |              `-{auditd}(4257)
+        |-automount(4536)-+-{automount}(4537) <==程序相似但 PID 不同！
+        |                 |-{automount}(4538)
+        |                 |-{automount}(4541)
+        |                 `-{automount}(4544)
+....(中间省略)....
+        |-sshd(4586)---sshd(16903)---bash(16905)---pstree(16967)
+....(中间省略)....
+        |-xfs(4692,xfs)   <==因为此程序拥有者并非运行 pstree 者！所以列出帐号
+....(底下省略)....
+# 在括号 () 内的即是 PID 以及该程序的 owner 喔！不过，由於我是使用 
+# root 的身份运行此一命令，所以属於 root 的程序就不会显示出来啦
+```
+
+## 3.2 Management 
+
+Method: By **signal**.
+
+Usually used signal:
+- #1 **SIGHUP**: Start the stopped process and reload the configuration and restart.
+- #2 **SIGINT**: Stop the process by `[Ctrl]+c`
+- #9 **SIGKILL**: Stop the process forcely and maybe some files remains.
+- #15 **SIGTERM**: Terminate a process normally.(But can't used to terminate problematic process)
+- #17 **SIGSTOP**: Stop the process by `[Ctrl]+z`
 # 4. Special file and process
 
 # 5. SELinux
