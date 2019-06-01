@@ -366,6 +366,13 @@ Usually used signal:
 - #9 **SIGKILL**: Stop the process forcely and maybe some files remains.
 - #15 **SIGTERM**: Terminate a process normally.(But can't used to terminate problematic process)
 - #17 **SIGSTOP**: Stop the process by `[Ctrl]+z`
+
+### `kill -signal PID`
+### `kill -signal CMD`
+
+## 3.3 Priority
+
+
 # 4. Special file and process
 
 # 5. SELinux
