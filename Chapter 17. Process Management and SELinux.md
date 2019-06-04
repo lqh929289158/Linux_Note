@@ -368,10 +368,61 @@ Usually used signal:
 - #17 **SIGSTOP**: Stop the process by `[Ctrl]+z`
 
 ### `kill -signal PID`
-### `kill -signal CMD`
+### `killall -signal CMD`
 
 ## 3.3 Priority
 
+### Priority and Nice
+
+Priority: Modified by **kernel** dynamically not user.
+Nice:Modified by user to influence priority.
+
+> NOTE: 
+> 1. PRI(new) = PRI(old) + nice. But it is not actually as this. The priority must be analyized by the kernel.
+> 2. The range of nice is between **-20 ~ 19**.
+> 3. **root** can modify the nice of **any** process. Range **-20 ~ 19**.
+> 4. The range of nice the user can set is between **0 ~ 19**.
+> 5. The user can only set **higher** nice than now.
+
+### `nice` command to set process nice initially.
+```
+[root@www ~]# nice [-n 数字] command
+选项与参数：
+-n  ：后面接一个数值，数值的范围 -20 ~ 19。
+
+范例一：用 root 给一个 nice 值为 -5 ，用於运行 vi ，并观察该程序！
+[root@www ~]# nice -n -5 vi &
+[1] 18676
+[root@www ~]# ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+4 S     0 18625 18623  0  75   0 -  1514 wait   pts/1    00:00:00 bash
+4 T     0 18676 18625  0  72  -5 -  1242 finish pts/1    00:00:00 vi
+4 R     0 18678 18625  0  77   0 -  1101 -      pts/1    00:00:00 ps
+# 原本的 bash PRI 为 75  ，所以 vi 默认应为 75。不过由於给予 nice  为 -5 
+```
+
+### `renice` modify nice value.
+```
+[root@www ~]# renice [number] PID
+选项与参数：
+PID ：某个程序的 ID 啊！
+
+范例一：找出自己的 bash PID ，并将该 PID 的 nice 调整到 10
+[root@www ~]# ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+4 S     0 18625 18623  0  75   0 -  1514 wait   pts/1    00:00:00 bash
+4 R     0 18712 18625  0  77   0 -  1102 -      pts/1    00:00:00 ps
+
+[root@www ~]# renice 10 18625
+18625: old priority 0, new priority 10
+
+[root@www ~]# ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+4 S     0 18625 18623  0  85  10 -  1514 wait   pts/1    00:00:00 bash
+4 R     0 18715 18625  0  87  10 -  1102 -      pts/1    00:00:00 ps
+```
+
+> NOTE: The nice value will be inheritted by the child process.
 
 # 4. Special file and process
 
