@@ -424,6 +424,173 @@ F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
 
 > NOTE: The nice value will be inheritted by the child process.
 
+## 3.4 Observe system resource allocation
+
+### `free` observe memory allocation
+
+```
+[root@www ~]# free [-b|-k|-m|-g] [-t]
+选项与参数：
+-b  ：直接输入 free 时，显示的单位是 Kbytes，我们可以使用 b(bytes), m(Mbytes)
+      k(Kbytes), 及 g(Gbytes) 来显示单位喔！
+-t  ：在输出的最终结果，显示实体内存与 swap 的总量。
+
+范例一：显示目前系统的内存容量
+[root@www ~]# free -m
+          total       used    free   shared   buffers    cached
+Mem:        725        666      59        0       132       287
+-/+ buffers/cache:     245     479
+Swap:       996          0     996
+```
+
+### `uname` show system and kernel info
+
+```
+[root@www ~]# uname [-asrmpi]
+选项与参数：
+-a  ：所有系统相关的资讯，包括底下的数据都会被列出来；
+-s  ：系统核心名称
+-r  ：核心的版本
+-m  ：本系统的硬件名称，例如 i686 或 x86_64 等；
+-p  ：CPU 的类型，与 -m 类似，只是显示的是 CPU 的类型！
+-i  ：硬件的平台 (ix86)
+
+范例一：输出系统的基本资讯
+[root@www ~]# uname -a
+Linux www.vbird.tsai 2.6.18-92.el5 #1 SMP Tue Jun 10 18:49:47 EDT 2008 i686
+i686 i386 GNU/Linux
+```
+
+### `uptime` starting time and work load.
+First line of `top`
+```
+[root@www ~]# uptime
+ 15:39:13 up 8 days, 14:52,  1 user,  load average: 0.00, 0.00, 0.00
+# top 这个命令已经谈过相关资讯，不再聊！
+```
+
+### `netstat` track network
+```
+[root@www ~]# netstat -[atunlp]
+选项与参数：
+-a  ：将目前系统上所有的连线、监听、Socket 数据都列出来
+-t  ：列出 tcp 网络封包的数据
+-u  ：列出 udp 网络封包的数据
+-n  ：不以程序的服务名称，以埠号 (port number) 来显示；
+-l  ：列出目前正在网络监听 (listen) 的服务；
+-p  ：列出该网络服务的程序 PID 
+
+范例一：列出目前系统已经创建的网络连线与 unix socket 状态
+[root@www ~]# netstat
+Active Internet connections (w/o servers) <==与网络较相关的部分
+Proto Recv-Q Send-Q Local Address        Foreign Address      State
+tcp        0    132 192.168.201.110:ssh  192.168.:vrtl-vmf-sa ESTABLISHED
+Active UNIX domain sockets (w/o servers)  <==与本机的程序自己的相关性(非网络)
+Proto RefCnt Flags       Type       State         I-Node Path
+unix  20     [ ]         DGRAM                    9153   /dev/log
+unix  3      [ ]         STREAM     CONNECTED     13317  /tmp/.X11-unix/X0
+unix  3      [ ]         STREAM     CONNECTED     13233  /tmp/.X11-unix/X0
+unix  3      [ ]         STREAM     CONNECTED     13208  /tmp/.font-unix/fs7100
+....(中间省略)....
+```
+
+About network
+- Proto: Protocol `tcp` or `udp`
+- Recv-Q: 
+- Send-Q:
+- Local-Address: IP:port
+- Foreign-Address: IP:port
+- State: `ESTABLISHED` or `LISTEN`
+
+About local process
+- Proto: `unix`
+- RefCnt: The number of processes connected to this socket
+- Flags:
+- Type: `STREAM`(connection) or `DGRAM`(connectionless)
+- State: `CONNECTED` Processes have been connected together.
+- Path: The path of process connected to this socket.
+```
+范例二：找出目前系统上已在监听的网络连线及其 PID
+[root@www ~]# netstat -tlnp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address    Foreign Address  State   PID/Program name
+tcp        0      0 127.0.0.1:2208   0.0.0.0:*        LISTEN  4566/hpiod
+tcp        0      0 0.0.0.0:111      0.0.0.0:*        LISTEN  4328/portmap
+tcp        0      0 127.0.0.1:631    0.0.0.0:*        LISTEN  4597/cupsd
+tcp        0      0 0.0.0.0:728      0.0.0.0:*        LISTEN  4362/rpc.statd
+tcp        0      0 127.0.0.1:25     0.0.0.0:*        LISTEN  4629/sendmail: 
+tcp        0      0 127.0.0.1:2207   0.0.0.0:*        LISTEN  4571/python
+tcp        0      0 :::22            :::*             LISTEN  4586/sshd
+# 除了可以列出监听网络的介面与状态之外，最后一个栏位还能够显示此服务的
+# PID 号码以及程序的命令名称喔！例如最后一行的 4586 就是该 PID
+
+范例三：将上述的本地端 127.0.0.1:631 那个网络服务关闭的话？
+[root@www ~]# kill -9 4597
+[root@www ~]# killall -9 cupsd
+```
+
+### `dmesg` analyze kernel info
+
+### `vmstat` detect system resource change
+
+```
+[root@www ~]# vmstat [-a] [延迟 [总计侦测次数]] <==CPU/内存等资讯
+[root@www ~]# vmstat [-fs]                      <==内存相关
+[root@www ~]# vmstat [-S 单位]                  <==配置显示数据的单位
+[root@www ~]# vmstat [-d]                       <==与磁碟有关
+[root@www ~]# vmstat [-p 分割槽]                <==与磁碟有关
+选项与参数：
+-a  ：使用 inactive/active(活跃与否) 取代 buffer/cache 的内存输出资讯；
+-f  ：启动到目前为止，系统复制 (fork) 的程序数；
+-s  ：将一些事件 (启动至目前为止) 导致的内存变化情况列表说明；
+-S  ：后面可以接单位，让显示的数据有单位。例如 K/M 取代 bytes 的容量；
+-d  ：列出磁碟的读写总量统计表
+-p  ：后面列出分割槽，可显示该分割槽的读写总量统计表
+
+范例一：统计目前主机 CPU 状态，每秒一次，共计三次！
+[root@www ~]# vmstat 1 3
+procs -----------memory---------- ---swap-- -----io---- --system-- -----cpu------
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 0  0     28  61540 137000 291960    0    0     4     5   38   55  0  0 100  0  0
+ 0  0     28  61540 137000 291960    0    0     0     0 1004   50  0  0 100  0  0
+ 0  0     28  61540 137000 291964    0    0     0     0 1022   65  0  0 100  0  0
+ ```
+
+- procs
+  - r: The number of processes waiting to be executed.
+  - b: The number of processes unable to be awakened.
+- memory
+  - swpd: Used virtual memory
+  - free: Not used memory
+  - buff: buffer memory
+  - cache
+- swap
+  - si: The amount of processes pulled from disk.
+  - so: The amount of processes written back to disk due to insufficient memory.
+- io
+  - bi: blocks written by disk
+  - bo: blocks written to disk
+- system
+  - in: times of interruption per second
+  - cs: context switch per second
+- cpu:
+  - us: non-kernel level cpu usage
+  - sy: kernel level cpu usage
+  - id: free
+  - wa: waiting for I/O cpu usage
+  - st: virtual machine cpu usage
+  
+```
+范例二：系统上面所有的磁碟的读写状态
+[root@www ~]# vmstat -d
+disk- ------------reads------------ ------------writes----------- -----IO------
+       total merged sectors      ms  total merged sectors      ms    cur    sec
+ram0       0      0       0       0      0      0       0       0      0      0
+....(中间省略)....
+hda   144188 182874 6667154 7916979 151341 510244 8027088 15244705      0    848
+hdb        0      0       0       0      0      0       0       0      0      0
+```
+
 # 4. Special file and process
 
 # 5. SELinux
