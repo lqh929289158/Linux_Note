@@ -593,4 +593,31 @@ hdb        0      0       0       0      0      0       0       0      0      0
 
 # 4. Special file and process
 
+## 4.1 SUID/SGID
+
+SUID:
+- Only for **binary program**.
+- Executor must have `x` **execution right**.
+- SUID right is only valid in **run-time**. 
+- Executor will have **owner** rights.
+
+```
+[dmtsai@www ~]$ passwd
+Changing password for user dmtsai.
+Changing password for dmtsai
+(current) UNIX password: <==这里按下 [ctrl]-z 并且按下 [enter]
+[1]+  Stopped                 passwd
+
+[dmtsai@www ~]$ pstree -u
+init-+-acpid
+....(中间省略)....
+     |-sshd---sshd---sshd(dmtsai)---bash-+-more
+     |                                   |-passwd(root)
+     |                                   `-pstree
+....(底下省略)....
+```
+
+Use `find / -perm +6000` to find the SUID/SGID file of the whole system.
+
+
 # 5. SELinux
