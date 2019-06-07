@@ -619,5 +619,55 @@ init-+-acpid
 
 Use `find / -perm +6000` to find the SUID/SGID file of the whole system.
 
+## 4.2 `/proc/*`
+
+Basically, all processes are written as a directory(named by PID) in `/proc/`
+
+```
+[root@www ~]# ll /proc
+dr-xr-xr-x  5 root      root              0 Mar 11 08:46 1
+dr-xr-xr-x  5 root      root              0 Mar 11 00:46 10
+dr-xr-xr-x  5 root      root              0 Mar 11 00:46 11
+....(中间省略)....
+```
+
+Process info are written as files in `/proc/[PID]`
+
+```
+
+[root@www ~]# ll /proc/1
+dr-xr-xr-x 2 root root 0 Mar 12 11:04 attr
+-r-------- 1 root root 0 Mar 17 14:32 auxv
+-r--r--r-- 1 root root 0 Mar 17 14:32 cmdline  <==就是命令串
+-rw-r--r-- 1 root root 0 Mar 17 14:32 coredump_filter
+-r--r--r-- 1 root root 0 Mar 17 14:32 cpuset
+lrwxrwxrwx 1 root root 0 Mar 17 14:32 cwd -> /
+-r-------- 1 root root 0 Mar 17 14:32 environ  <==一些环境变量
+lrwxrwxrwx 1 root root 0 Mar 17 14:32 exe -> /sbin/init  <==实际运行的命令
+....(以下省略)....
+```
+
+- cmdline: The command that created this process.
+- environ: The environment variables of the process.
+
+The files in `/proc/` are info about the system.
+
+- `/proc/cmdline`: The functions called when loading kernel.
+- `/proc/cpuinfo`: CPU infos(including clock, type, arthemaitc functions.
+- `/proc/devices`: Devices info and ID, (Refer `mknod`)
+- `/proc/filesystems`
+- `/proc/interrupts`: IRQ allocation
+- `/proc/ioports`: I/O addresses for each devices.
+- `/proc/kcore`: Memory size
+- `/proc/loadavg`: The three averaged values of `top` and `uptime` recorded here.
+- `/proc/meminfo`: info listed by `free`.
+- `/proc/modules`: Modules loaded by system(Drivers)
+- `/proc/mounts`
+- `/proc/swaps`: infos about partition
+- `/proc/partitions`: info listed by `fdisk -l`
+- `/proc/pci`: `lspci`
+- `/proc/uptime`: `uptime`
+- `/proc/verstion`: `uname -a`
+- `/proc/bus/*`: Devices(including flash disk)
 
 # 5. SELinux
