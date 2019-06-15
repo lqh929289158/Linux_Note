@@ -129,7 +129,58 @@ tcp    0 0 0.0.0.0:873      0.0.0.0:*     LISTEN      4925/xinetd
 ```
 
 You have to modify the configuration file in `/etc/xinetd.d/` and then restart **xinetd**(a stand alone daemon).
+
 # 2. Analyze configuration of **super daemon**
+
+## 2.1 Default configuration file `xinetd.conf`
+
+```
+[root@www ~]# vim /etc/xinetd.conf
+defaults
+{
+# 服务启动成功或失败，以及相关登陆行为的记录文件
+        log_type        = SYSLOG daemon info  <==登录文件的记录服务类型
+        log_on_failure  = HOST   <==发生错误时需要记录的信息为主机 (HOST)
+        log_on_success  = PID HOST DURATION EXIT <==成功启动或登陆时的记录信息
+# 允许或限制联机的默认值
+        cps         = 50 10 <==同一秒内的最大联机数为 50 个，若超过则暂停 10 秒
+        instances   = 50    <==同一服务的最大同时联机数
+        per_source  = 10    <==同一来源的客户端的最大联机数
+# 网络 (network) 相关的默认值
+        v6only          = no <==是否仅允许 IPv6 ？可以先暂时不启动 IPv6 支持！
+# 环境参数的配置
+        groups          = yes
+        umask           = 002
+}
+
+includedir /etc/xinetd.d <==更多的配置值在 /etc/xinetd.d 那个目录内
+```
+
+The format of `/etc/xinetd.d/xxx.conf`
+```
+service  <service_name>
+{
+       <attribute>   <assign_op>   <value>   <value> ...
+       .............
+}
+```
+
+- `service`:keyword
+- `<service_name>`: the same service name in `/etc/services`
+- `<assign_op>`: 
+  - **=**: assign parameters as follows
+  - **+=**: add parameters as follows
+  - **-=**: remove parameters as follows
+
+| attribute | value | meaning |
+| --------- | ----- | ------- |
+| disable | yes or no | disable |
+| id | numeber | the identifier for different services(even for same services with different configurations) |
+| server | the absolute path of the program | the path of the start program of the service |
+| server_args | `--daemon` etc. | parameters for server attributes |
+| user | UID of the service program | start the service by which user's ID |
+| group | GID of the service program | start the service by which group's ID |
+
 
 # 3. Firewall of service `xinetd`, `TCP Wrappers`
 
