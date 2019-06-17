@@ -180,7 +180,14 @@ service  <service_name>
 | server_args | `--daemon` etc. | parameters for server attributes |
 | user | UID of the service program | start the service by which user's ID |
 | group | GID of the service program | start the service by which group's ID |
-
+| socket_type | \[stream\|dgram\|raw\] | TCP\|UDP\|direct-IP |
+| protocol | \[tcp\|udp\] | optional |
+| wait | \[yes(single)\|no(multi)\] | default:no. Usually, yes for udp, no for tcp |
+| instances | \[num\] or UNLIMITED | max connections |
+| per_source | \[num\] or UNLIMITED | max connections per IP source |
+| cps | \[num1 num2\] | num1 for max connection request per second,otherwise stop the service for num2 seconds |
+| log_type | \[log_entry grade\] | default grade: info |
+| log_on_success, log_on_failure | \[PID,HOST,USERID,EXIT,DURATION\] | PID:Serice PID, HOST: Remote host IP, DURATION: Used time |
 
 # 3. Firewall of service `xinetd`, `TCP Wrappers`
 
